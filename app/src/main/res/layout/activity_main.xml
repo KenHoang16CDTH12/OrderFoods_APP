@@ -4,35 +4,39 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg2"
+    android:background="@drawable/foodbg1"
     android:fitsSystemWindows="true"
     tools:context="it.hueic.kenhoang.orderfoods_app.MainActivity">
+    <TextView
+        android:text="Food\u00AEFast"
+        android:textSize="80sp"
+        android:textStyle="bold"
+        android:fontFamily="cursive"
+        android:textAlignment="center"
+        android:textColor="@android:color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
     <LinearLayout
         android:orientation="vertical"
-        android:layout_centerVertical="true"
         android:layout_width="match_parent"
+        android:layout_centerVertical="true"
         android:layout_height="wrap_content">
         <TextView
-            android:text="Food\u00AE"
-            android:textSize="80sp"
-            android:textStyle="bold"
-            android:fontFamily="cursive"
-            android:textColor="#1A237E"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <TextView
-            android:text=" Fast"
-            android:textSize="80sp"
-            android:textStyle="bold"
+            android:id="@+id/tvSlogan"
+            android:background="@color/overlayBackground"
+            android:textSize="30sp"
+            android:textColor="@android:color/white"
+            android:padding="10dp"
             android:textAlignment="center"
-            android:fontFamily="cursive"
-            android:textColor="#1A237E"
-            android:layout_width="wrap_content"
+            android:text="@string/slogan"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </LinearLayout>
     <LinearLayout
         android:layout_alignParentBottom="true"
         android:weightSum="2"
+        android:layout_margin="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <Button

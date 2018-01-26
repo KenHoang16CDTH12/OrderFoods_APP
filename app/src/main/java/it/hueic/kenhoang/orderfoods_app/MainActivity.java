@@ -1,13 +1,16 @@
 package it.hueic.kenhoang.orderfoods_app;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
     private Button mBtnSignIn, mBtnSignUp;
+    private TextView tvSlogan;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,7 +43,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initViews() {
+        tvSlogan   = findViewById(R.id.tvSlogan);
         mBtnSignIn = findViewById(R.id.btnSignIn);
         mBtnSignUp = findViewById(R.id.btnSignUp);
+
+        Typeface face = Typeface.createFromAsset(getAssets(), "fonts/NABILA.TTF");
+        tvSlogan.setTypeface(face);
     }
 }
