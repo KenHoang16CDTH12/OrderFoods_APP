@@ -1,18 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/bg2"
+    android:fitsSystemWindows="true"
     tools:context="it.hueic.kenhoang.orderfoods_app.MainActivity">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-</android.support.constraint.ConstraintLayout>
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_centerVertical="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:text="Food\u00AE"
+            android:textSize="80sp"
+            android:textStyle="bold"
+            android:fontFamily="cursive"
+            android:textColor="#1A237E"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:text=" Fast"
+            android:textSize="80sp"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:fontFamily="cursive"
+            android:textColor="#1A237E"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_alignParentBottom="true"
+        android:weightSum="2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/btnSignUp"
+            android:background="@drawable/btn_signup_design"
+            android:text="Sign Up"
+            android:layout_margin="10dp"
+            android:textColor="@android:color/white"
+            android:textAllCaps="false"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/btnSignIn"
+            android:background="@drawable/btn_signin_design"
+            android:text="Sign In"
+            android:layout_margin="10dp"
+            android:textColor="@android:color/white"
+            android:textAllCaps="false"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</RelativeLayout>
