@@ -1,6 +1,7 @@
 package it.hueic.kenhoang.orderfoods_app;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -14,6 +15,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
+import it.hueic.kenhoang.orderfoods_app.common.Common;
 import it.hueic.kenhoang.orderfoods_app.model.User;
 
 public class SignInActivity extends AppCompatActivity {
@@ -53,7 +55,10 @@ public class SignInActivity extends AppCompatActivity {
                                     .child(edPhone.getText().toString())
                                     .getValue(User.class);
                             if (user.getPassword().equals(edPass.getText().toString())) {
-                                Toast.makeText(SignInActivity.this, "Sign In success ...", Toast.LENGTH_SHORT).show();
+                                Intent homeIntent = new Intent(SignInActivity.this, HomeActivity.class);;
+                                Common.currentUser = user;
+                                startActivity(homeIntent);
+                                finish();
                             } else {
                                 Toast.makeText(SignInActivity.this, "Wrong password ...", Toast.LENGTH_SHORT).show();
                             }

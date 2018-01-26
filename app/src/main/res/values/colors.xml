@@ -7,4 +7,7 @@
     <color name="colorButtonSignUp">#3F51B5</color>
     <color name="colorButtonSignIn">#009688</color>
     <color name="colorButtonSignUpPink">#FE2D55</color>
+
+    <color name="overlayBackground">#7f333639</color>
+    <color name="overlayActionBar">#0e0d0e</color>
 </resources>
