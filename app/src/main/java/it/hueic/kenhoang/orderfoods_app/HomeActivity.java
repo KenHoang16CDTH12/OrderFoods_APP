@@ -1,5 +1,6 @@
 package it.hueic.kenhoang.orderfoods_app;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -32,8 +33,9 @@ public class HomeActivity extends AppCompatActivity
     //View
     TextView tvFullName, tvTitle;
     private DatabaseReference mCategoryData;
-    RecyclerView recyler_menu;
-    RecyclerView.LayoutManager mLayoutManger;
+    private RecyclerView recyler_menu;
+    private RecyclerView.LayoutManager mLayoutManger;
+    private FirebaseRecyclerAdapter<Category, MenuViewHolder> adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,7 +84,7 @@ public class HomeActivity extends AppCompatActivity
     }
 
     private void loadMenu() {
-        FirebaseRecyclerAdapter<Category, MenuViewHolder> adapter = new FirebaseRecyclerAdapter<Category, MenuViewHolder>(
+        adapter = new FirebaseRecyclerAdapter<Category, MenuViewHolder>(
                 Category.class,
                 R.layout.item_category_menu,
                 MenuViewHolder.class,
@@ -97,7 +99,11 @@ public class HomeActivity extends AppCompatActivity
                 viewHolder.setItemClickListener(new ItemClickListener() {
                     @Override
                     public void onClick(View view, int position, boolean isLongClick) {
-                        Toast.makeText(HomeActivity.this, "" + clickItem.getName(), Toast.LENGTH_SHORT).show();
+                       //Get CategoryId and send to new Activity
+                        Intent foodListIntent = new Intent(HomeActivity.this, ListFoodActivity.class);
+                        //Because CategoryId is key, so we just get key of this item
+                        foodListIntent.putExtra("CategoryId", adapter.getRef(position).getKey());
+                        startActivity(foodListIntent);
                     }
                 });
             }

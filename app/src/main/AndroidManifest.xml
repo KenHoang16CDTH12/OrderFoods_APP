@@ -23,7 +23,8 @@
         <activity
             android:name=".HomeActivity"
             android:label="@string/title_activity_home"
-            android:theme="@style/AppTheme.ActionBar.Transparent"></activity>
+            android:theme="@style/AppTheme.ActionBar.Transparent" />
+        <activity android:name=".ListFoodActivity"></activity>
     </application>
 
 </manifest>
