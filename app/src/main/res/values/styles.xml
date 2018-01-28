@@ -1,7 +1,7 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -34,4 +34,17 @@
 
     <style name="AppTheme.ActionBar.Transparent.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <!--Collapsing style-->
+    <style name="CollapsedAppbar" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textSize">24sp</item>
+        <item name="android:background">@color/overlayBackground</item>
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="ExpandedAppbar" parent="@android:style/TextAppearance.Material.Title" tools:ignore="NewApi">
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:fontFamily">cursive</item>
+        <item name="android:textStyle">normal</item>
+    </style>
 </resources>
