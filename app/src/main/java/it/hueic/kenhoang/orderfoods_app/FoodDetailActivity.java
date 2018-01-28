@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
 import com.flaviofaria.kenburnsview.KenBurnsView;
@@ -16,7 +17,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import it.hueic.kenhoang.orderfoods_app.database.Database;
 import it.hueic.kenhoang.orderfoods_app.model.Food;
+import it.hueic.kenhoang.orderfoods_app.model.Order;
 
 public class FoodDetailActivity extends AppCompatActivity {
     TextView food_name, food_price, food_description;
@@ -28,6 +31,8 @@ public class FoodDetailActivity extends AppCompatActivity {
     String foodId = "";
 
     DatabaseReference mDataFood;
+
+    Food currentFood;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,27 +48,45 @@ public class FoodDetailActivity extends AppCompatActivity {
         if (getIntent() != null)
             foodId = getIntent().getStringExtra("FoodId");
         if (!foodId.isEmpty()) getDetailFood(foodId);
+        //InitEvent
+        initEvent();
     }
 
     private void getDetailFood(String foodId) {
         mDataFood.child(foodId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Food food = dataSnapshot.getValue(Food.class);
+                currentFood = dataSnapshot.getValue(Food.class);
                 //Set image
                 Picasso.with(getBaseContext())
-                        .load(food.getImage())
+                        .load(currentFood.getImage())
                         .into(food_image);
-                collapsingToolbarLayout.setTitle(food.getName());
-                food_price.setText(food.getPrice());
-                food_name.setText(food.getName());
-                food_description.setText(food.getDescription());
+                collapsingToolbarLayout.setTitle(currentFood.getName());
+                food_price.setText(currentFood.getPrice());
+                food_name.setText(currentFood.getName());
+                food_description.setText(currentFood.getDescription());
 
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
+            }
+        });
+    }
+
+    private void initEvent() {
+        btnCart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new Database(getBaseContext()).addToCart(new Order(
+                        foodId,
+                        currentFood.getName(),
+                        numberButton.getNumber(),
+                        currentFood.getPrice(),
+                        currentFood.getDiscount()
+                ));
+                Toast.makeText(FoodDetailActivity.this, "Added to Cart", Toast.LENGTH_SHORT).show();
             }
         });
     }
