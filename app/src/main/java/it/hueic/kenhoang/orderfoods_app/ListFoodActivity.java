@@ -1,5 +1,6 @@
 package it.hueic.kenhoang.orderfoods_app;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -63,7 +64,10 @@ public class ListFoodActivity extends AppCompatActivity {
                 viewHolder.setItemClickListener(new ItemClickListener() {
                     @Override
                     public void onClick(View view, int position, boolean isLongClick) {
-                        Toast.makeText(ListFoodActivity.this, "" + local.getName(), Toast.LENGTH_SHORT).show();
+                        //Start new Activity
+                        Intent foodDetailIntent = new Intent(ListFoodActivity.this, FoodDetailActivity.class);
+                        foodDetailIntent.putExtra("FoodId", adapter.getRef(position).getKey()); //Send Food Id to new activity
+                        startActivity(foodDetailIntent);
                     }
                 });
             }
