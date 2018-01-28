@@ -37,7 +37,11 @@ dependencies {
     //KenBurnsView
     implementation 'com.flaviofaria:kenburnsview:1.0.7'
     //Elegant Number Button
-    compile 'com.cepheuen.elegant-number-button:lib:1.0.2'
+    implementation 'com.cepheuen.elegant-number-button:lib:1.0.2'
+    //TextDrawable
+    implementation 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
+    //sqliteassethelper
+    compile 'com.readystatesoftware.sqliteasset:sqliteassethelper:+'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'

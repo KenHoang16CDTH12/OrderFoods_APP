@@ -24,10 +24,10 @@
         <activity android:name=".SignUpActivity" />
         <activity
             android:name=".HomeActivity"
-            android:label="@string/title_activity_home"/>
+            android:label="@string/title_activity_home" />
         <activity android:name=".ListFoodActivity" />
-        <activity android:name=".FoodDetailActivity"
-            ></activity>
+        <activity android:name=".FoodDetailActivity" />
+        <activity android:name=".CartActivity"></activity>
     </application>
 
 </manifest>
