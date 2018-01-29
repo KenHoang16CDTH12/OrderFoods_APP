@@ -31,7 +31,7 @@ import it.hueic.kenhoang.orderfoods_app.model.Order;
 import it.hueic.kenhoang.orderfoods_app.model.Request;
 
 public class CartActivity extends AppCompatActivity {
-    RecyclerView recyclerView;
+    RecyclerView listCarts;
     RecyclerView.LayoutManager mLayoutManager;
     RelativeLayout relMainCart;
     TextView tvTotalPrice, tvTitle;
@@ -63,7 +63,7 @@ public class CartActivity extends AppCompatActivity {
     private void loadListCart() {
         carts = new Database(this).getCarts();
         adapter = new CartAdapter(carts, this);
-        recyclerView.setAdapter(adapter);
+        listCarts.setAdapter(adapter);
         //Calculate total price
         int total = 0;
         for (Order order: carts)
@@ -77,7 +77,8 @@ public class CartActivity extends AppCompatActivity {
         btnPlace.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showAlertDialog();
+                if (!carts.isEmpty()) showAlertDialog();
+                else  Snackbar.make(relMainCart, "Cart is empty", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -109,10 +110,13 @@ public class CartActivity extends AppCompatActivity {
                 );
                 //Submit to FireBase
                 //We will using System.currentMilli to key
+                //Delete cart
                 mDataRequest.child(String.valueOf(System.currentTimeMillis()))
                             .setValue(request);
-                //Delete cart
                 new Database(getBaseContext()).cleanCart();
+                loadListCart();
+                adapter.notifyDataSetChanged();
+                listCarts.setAdapter(adapter);
                 Snackbar.make(relMainCart, "Thank you, Order Place", Toast.LENGTH_SHORT).show();
                 dialogInterface.dismiss();
             }
@@ -132,10 +136,10 @@ public class CartActivity extends AppCompatActivity {
         tvTitle         = findViewById(R.id.tvTitle);
         tvTitle.setText("Cart List");
         setSupportActionBar(toolbar);
-        recyclerView = findViewById(R.id.recycler_cart);
-        recyclerView.setHasFixedSize(true);
+        listCarts = findViewById(R.id.recycler_cart);
+        listCarts.setHasFixedSize(true);
         mLayoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(mLayoutManager);
+        listCarts.setLayoutManager(mLayoutManager);
         relMainCart = findViewById(R.id.relMainCart);
         tvTotalPrice = findViewById(R.id.total);
         btnPlace = findViewById(R.id.btnPlaceOrder);

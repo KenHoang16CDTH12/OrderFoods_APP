@@ -2,6 +2,7 @@ package it.hueic.kenhoang.orderfoods_app;
 
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -86,7 +87,7 @@ public class FoodDetailActivity extends AppCompatActivity {
                         currentFood.getPrice(),
                         currentFood.getDiscount()
                 ));
-                Toast.makeText(FoodDetailActivity.this, "Added to Cart", Toast.LENGTH_SHORT).show();
+                Snackbar.make(findViewById(R.id.coordinatorMain), "Added to cart ...", Toast.LENGTH_SHORT).show();
             }
         });
     }

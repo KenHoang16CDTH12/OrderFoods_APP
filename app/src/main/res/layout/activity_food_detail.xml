@@ -2,6 +2,7 @@
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinatorMain"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/foodbg1"
@@ -95,7 +96,7 @@
                         android:layout_marginBottom="18dp"
                         android:layout_width="100dp"
                         android:layout_height="30dp"
-                        app:textSize="12sp"
+                        app:textSize="8sp"
                         app:backGroundColor="@color/colorAccent"
                         app:initialNumber="1"
                         app:finalNumber="20"/>
