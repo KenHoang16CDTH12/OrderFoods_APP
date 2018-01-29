@@ -27,7 +27,8 @@
             android:label="@string/title_activity_home" />
         <activity android:name=".ListFoodActivity" />
         <activity android:name=".FoodDetailActivity" />
-        <activity android:name=".CartActivity"></activity>
+        <activity android:name=".CartActivity" />
+        <activity android:name=".OrderStatusActivity"></activity>
     </application>
 
 </manifest>

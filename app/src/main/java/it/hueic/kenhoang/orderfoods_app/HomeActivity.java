@@ -16,7 +16,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
@@ -149,11 +148,14 @@ public class HomeActivity extends AppCompatActivity
         if (id == R.id.nav_menu) {
 
         } else if (id == R.id.nav_cart) {
-
+            startActivity(new Intent(HomeActivity.this, CartActivity.class));
         } else if (id == R.id.nav_orders) {
-
+            startActivity(new Intent(HomeActivity.this, OrderStatusActivity.class));
         } else if (id == R.id.nav_log_out) {
-
+            //Logout
+            Intent signInIntent = new Intent(HomeActivity.this, SignInActivity.class);
+            signInIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(signInIntent);
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
