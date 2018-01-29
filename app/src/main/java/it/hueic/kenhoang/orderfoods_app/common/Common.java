@@ -8,4 +8,5 @@ import it.hueic.kenhoang.orderfoods_app.model.User;
 
 public class Common {
     public static User currentUser;
+    public static String nameProduct = "";
 }

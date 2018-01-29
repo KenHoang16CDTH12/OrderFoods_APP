@@ -1,4 +1,4 @@
-package it.hueic.kenhoang.orderfoods_app.ViewHolder;
+package it.hueic.kenhoang.orderfoods_app.adapter.ViewHolder;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
