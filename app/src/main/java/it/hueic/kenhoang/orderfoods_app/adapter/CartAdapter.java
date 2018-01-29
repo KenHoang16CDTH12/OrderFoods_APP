@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Locale;
 
 import it.hueic.kenhoang.orderfoods_app.R;
-import it.hueic.kenhoang.orderfoods_app.ViewHolder.CartViewHolder;
+import it.hueic.kenhoang.orderfoods_app.adapter.ViewHolder.CartViewHolder;
 import it.hueic.kenhoang.orderfoods_app.model.Order;
 
 /**

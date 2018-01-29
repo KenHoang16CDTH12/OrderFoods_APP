@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "it.hueic.kenhoang.orderfoods_app"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
@@ -41,7 +41,9 @@ dependencies {
     //TextDrawable
     implementation 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
     //sqliteassethelper
-    compile 'com.readystatesoftware.sqliteasset:sqliteassethelper:+'
+    implementation 'com.readystatesoftware.sqliteasset:sqliteassethelper:+'
+    //MaterialSearchBar
+    implementation 'com.github.mancj:MaterialSearchBar:0.7.5'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'

@@ -9,6 +9,13 @@
     android:layout_height="match_parent"
     tools:context="it.hueic.kenhoang.orderfoods_app.ListFoodActivity">
     <include layout="@layout/toolbar"/>
+    <com.mancj.materialsearchbar.MaterialSearchBar
+        android:id="@+id/searchBar"
+        android:layout_margin="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:mt_speechMode="false"
+        app:mt_hint="Enter your food"/>
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_food"
         android:scrollbars="vertical"

@@ -3,7 +3,6 @@ package it.hueic.kenhoang.orderfoods_app;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -23,7 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
 import it.hueic.kenhoang.orderfoods_app.Interface.ItemClickListener;
-import it.hueic.kenhoang.orderfoods_app.ViewHolder.MenuViewHolder;
+import it.hueic.kenhoang.orderfoods_app.adapter.ViewHolder.MenuViewHolder;
 import it.hueic.kenhoang.orderfoods_app.common.Common;
 import it.hueic.kenhoang.orderfoods_app.model.Category;
 
