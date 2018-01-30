@@ -5,6 +5,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -80,13 +81,13 @@ public class FoodDetailActivity extends AppCompatActivity {
         btnCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new Database(getBaseContext()).addToCart(new Order(
-                        foodId,
-                        currentFood.getName(),
-                        numberButton.getNumber(),
-                        currentFood.getPrice(),
-                        currentFood.getDiscount()
-                ));
+                    new Database(getBaseContext()).addToCart(new Order(
+                            foodId,
+                            currentFood.getName(),
+                            numberButton.getNumber(),
+                            currentFood.getPrice(),
+                            currentFood.getDiscount()
+                    ));
                 Snackbar.make(findViewById(R.id.coordinatorMain), "Added to cart ...", Toast.LENGTH_SHORT).show();
             }
         });
