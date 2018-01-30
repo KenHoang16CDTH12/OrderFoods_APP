@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/relSignUpMain"
     android:fitsSystemWindows="true"
     android:background="@drawable/bg2"
     tools:context="it.hueic.kenhoang.orderfoods_app.SignInActivity">

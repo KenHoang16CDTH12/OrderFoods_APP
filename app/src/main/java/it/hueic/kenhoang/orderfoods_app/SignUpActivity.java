@@ -1,6 +1,7 @@
 package it.hueic.kenhoang.orderfoods_app;
 
 import android.app.ProgressDialog;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -47,12 +48,12 @@ public class SignUpActivity extends AppCompatActivity {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (dataSnapshot.child(edPhone.getText().toString()).exists()) {
                             mProgressbar.dismiss();
-                            Toast.makeText(SignUpActivity.this, "Phone number already register", Toast.LENGTH_SHORT).show();
+                            Snackbar.make(findViewById(R.id.relSignUpMain), "Phone number already register ...", Toast.LENGTH_SHORT).show();
                         } else {
                             mProgressbar.dismiss();
                             User user = new User(edName.getText().toString(), edPass.getText().toString());
                             mDataUser.child(edPhone.getText().toString()).setValue(user);
-                            Toast.makeText(SignUpActivity.this, "Sign up successfully!", Toast.LENGTH_SHORT).show();
+                            Snackbar.make(findViewById(R.id.relSignUpMain), "Sign up successfully ...", Toast.LENGTH_SHORT).show();
                             finish();
                         }
                     }

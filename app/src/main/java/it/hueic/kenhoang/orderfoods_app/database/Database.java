@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
+import android.util.Log;
 
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
@@ -56,7 +57,12 @@ public class Database extends SQLiteAssetHelper {
                 order.getQuantity(),
                 order.getPrice(),
                 order.getDiscount());
-        db.execSQL(query);
+        try {
+            db.execSQL(query);
+        } catch (Exception ex) {
+            Log.e("ERROR", ex.getMessage());
+        }
+
     }
 
     public void cleanCart() {

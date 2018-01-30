@@ -2,6 +2,7 @@ package it.hueic.kenhoang.orderfoods_app;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -61,11 +62,11 @@ public class SignInActivity extends AppCompatActivity {
                                 startActivity(homeIntent);
                                 finish();
                             } else {
-                                Toast.makeText(SignInActivity.this, "Wrong password ...", Toast.LENGTH_SHORT).show();
+                                Snackbar.make(findViewById(R.id.relSignInMain), "Wrong password ...", Toast.LENGTH_SHORT).show();
                             }
                         } else {
                             mProgressbar.dismiss();
-                            Toast.makeText(SignInActivity.this, "User not exist in database", Toast.LENGTH_SHORT).show();
+                            Snackbar.make(findViewById(R.id.relSignInMain), "User not exists database ...", Toast.LENGTH_SHORT).show();
                         }
                     }
 
