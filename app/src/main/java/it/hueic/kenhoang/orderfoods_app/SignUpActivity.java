@@ -53,7 +53,7 @@ public class SignUpActivity extends AppCompatActivity {
                             mProgressbar.dismiss();
                             User user = new User(edName.getText().toString(), edPass.getText().toString());
                             mDataUser.child(edPhone.getText().toString()).setValue(user);
-                            Snackbar.make(findViewById(R.id.relSignUpMain), "Sign up successfully ...", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getBaseContext(), "Sign up successfully ...", Toast.LENGTH_SHORT).show();
                             finish();
                         }
                     }
