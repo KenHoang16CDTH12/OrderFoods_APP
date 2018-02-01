@@ -28,7 +28,6 @@ dependencies {
     //Add Library
     implementation 'com.google.firebase:firebase-core:11.8.0'
     implementation 'com.google.firebase:firebase-database:11.8.0'
-    implementation 'com.google.firebase:firebase-database:11.8.0'
     implementation 'com.firebaseui:firebase-ui-database:1.2.0'
     //EditText Material
     implementation 'com.rengwuxian.materialedittext:library:2.1.4'

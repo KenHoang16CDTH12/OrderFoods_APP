@@ -25,6 +25,7 @@ import it.hueic.kenhoang.orderfoods_app.Interface.ItemClickListener;
 import it.hueic.kenhoang.orderfoods_app.adapter.ViewHolder.MenuViewHolder;
 import it.hueic.kenhoang.orderfoods_app.common.Common;
 import it.hueic.kenhoang.orderfoods_app.model.Category;
+import it.hueic.kenhoang.orderfoods_app.service.ListerOrder;
 
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -46,6 +47,9 @@ public class HomeActivity extends AppCompatActivity
         tvTitle         = findViewById(R.id.tvTitle);
         tvTitle.setText("Menu");
         setSupportActionBar(toolbar);
+        //Register Service
+        Intent serviceIntent = new Intent(HomeActivity.this, ListerOrder.class);
+        startService(serviceIntent);
         //Init FireBase
         mCategoryData   = FirebaseDatabase.getInstance().getReference("Category");
 
@@ -78,6 +82,7 @@ public class HomeActivity extends AppCompatActivity
         recyler_menu.setLayoutManager(mLayoutManger);
 
         loadMenu();
+
 
     }
 

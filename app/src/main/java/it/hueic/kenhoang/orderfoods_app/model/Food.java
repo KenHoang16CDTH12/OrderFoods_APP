@@ -5,71 +5,70 @@ package it.hueic.kenhoang.orderfoods_app.model;
  */
 
 public class Food {
-    private String Name;
-    private String Image;
-    private String Description;
-    private String Price;
-    private String Discount;
-    private String MenuId;
+    private String name;
+    private String image;
+    private String description;
+    private String price;
+    private String discount;
+    private String menuId;
 
     public Food() {
     }
 
     public Food(String name, String image, String description, String price, String discount, String menuId) {
-        Name = name;
-        Image = image;
-        Description = description;
-        Price = price;
-        Discount = discount;
-        MenuId = menuId;
+        this.name = name;
+        this.image = image;
+        this.description = description;
+        this.price = price;
+        this.discount = discount;
+        this.menuId = menuId;
     }
 
     public String getName() {
-        return Name;
+        return name;
     }
 
     public void setName(String name) {
-        Name = name;
+        this.name = name;
     }
 
     public String getImage() {
-        return Image;
+        return image;
     }
 
     public void setImage(String image) {
-        Image = image;
+        this.image = image;
     }
 
     public String getDescription() {
-        return Description;
+        return description;
     }
 
     public void setDescription(String description) {
-        Description = description;
+        this.description = description;
     }
 
     public String getPrice() {
-        return Price;
+        return price;
     }
 
     public void setPrice(String price) {
-        Price = price;
+        this.price = price;
     }
 
     public String getDiscount() {
-        return Discount;
+        return discount;
     }
 
     public void setDiscount(String discount) {
-        Discount = discount;
+        this.discount = discount;
     }
 
     public String getMenuId() {
-        return MenuId;
+        return menuId;
     }
 
     public void setMenuId(String menuId) {
-        MenuId = menuId;
+        this.menuId = menuId;
     }
-
 }
