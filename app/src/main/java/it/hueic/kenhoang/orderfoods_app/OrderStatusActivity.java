@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -28,14 +29,22 @@ public class OrderStatusActivity extends AppCompatActivity {
         getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-        setContentView(R.layout.activity_main);
         setContentView(R.layout.activity_order_status);
-        //Firebase
+        //FireBase
         mDataRequest = FirebaseDatabase.getInstance().getReference("Requests");
         //InitView
         initView();
         //load data
-        loadOrders(Common.currentUser.getPhone());
+        //If we start OrderStatus activity from Home Activity
+        //We will not put any extra, so we just loadOrder by phone from Common
+        if (getIntent().getStringExtra("userPhone") == null) {
+            loadOrders(Common.currentUser.getPhone());
+        }
+        else {
+            loadOrders(getIntent().getStringExtra("userPhone"));
+            Log.e("TAG", "onCreate: " +  getIntent().getStringExtra("userPhone") );
+        }
+
     }
 
     private void loadOrders(String phone) {
@@ -49,31 +58,12 @@ public class OrderStatusActivity extends AppCompatActivity {
             @Override
             protected void populateViewHolder(OrderViewHolder viewHolder, Request model, int position) {
                 viewHolder.txtOrderId.setText("#" + adapter.getRef(position).getKey());
-                viewHolder.txtOrderStatus.setText(convertCodeToStatus(model.getStatus()));
+                viewHolder.txtOrderStatus.setText(Common.convertCodeToStatus(model.getStatus()));
                 viewHolder.txtOrderAddress.setText(model.getAddress());
                 viewHolder.txtOrderPhone.setText(model.getPhone());
             }
         };
         recyclerView.setAdapter(adapter);
-    }
-
-    private String convertCodeToStatus(String status) {
-        String result = "";
-        switch (status) {
-            case "0":
-                result = "Placed";
-                break;
-            case "1":
-                result = "On my way";
-                break;
-            case "2":
-                result = "Shipped";
-                break;
-            default:
-                result = "Error";
-                break;
-        }
-        return result;
     }
 
     private void initView() {

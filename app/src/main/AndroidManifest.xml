@@ -30,6 +30,9 @@
         <activity android:name=".FoodDetailActivity" />
         <activity android:name=".CartActivity" />
         <activity android:name=".OrderStatusActivity"></activity>
+        <service
+            android:name=".service.ListerOrder"
+            android:enabled="true" />
     </application>
 
 </manifest>

@@ -115,7 +115,7 @@ public class ListFoodActivity extends AppCompatActivity {
                 Food.class,
                 R.layout.item_food_ref_menu,
                 FoodVIewHolder.class,
-                mFoodData.orderByChild("Name").equalTo(String.valueOf(text)) //Compare name
+                mFoodData.orderByChild("name").equalTo(String.valueOf(text)) //Compare name
         ) {
             @Override
             protected void populateViewHolder(FoodVIewHolder viewHolder, Food model, int position) {
@@ -142,7 +142,7 @@ public class ListFoodActivity extends AppCompatActivity {
      * Fill data search bar
      */
     private void loadSuggest() {
-        mFoodData.orderByChild("MenuId").equalTo(categoryId)
+        mFoodData.orderByChild("menuId").equalTo(categoryId)
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -164,7 +164,7 @@ public class ListFoodActivity extends AppCompatActivity {
                 Food.class,
                 R.layout.item_food_ref_menu,
                 FoodVIewHolder.class,
-                mFoodData.orderByChild("MenuId").equalTo(categoryId)
+                mFoodData.orderByChild("menuId").equalTo(categoryId)
                 //Like: Select * From Foods where MenuId = ?
         ) {
             @Override

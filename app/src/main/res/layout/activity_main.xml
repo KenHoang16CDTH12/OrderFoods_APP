@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/mainLayout"
     android:background="@drawable/foodbg1"
     android:fitsSystemWindows="true"
     tools:context="it.hueic.kenhoang.orderfoods_app.MainActivity">

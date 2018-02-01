@@ -55,8 +55,8 @@ public class SignInActivity extends AppCompatActivity {
                             User user = dataSnapshot
                                     .child(edPhone.getText().toString())
                                     .getValue(User.class);
-                            user.setPhone(edPhone.getText().toString());//Set phone
                             if (user.getPassword().equals(edPass.getText().toString())) {
+                                user.setPhone(edPhone.getText().toString());//Set phone
                                 Intent homeIntent = new Intent(SignInActivity.this, HomeActivity.class);;
                                 Common.currentUser = user;
                                 startActivity(homeIntent);
