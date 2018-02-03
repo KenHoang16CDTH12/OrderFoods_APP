@@ -1,16 +1,32 @@
 package it.hueic.kenhoang.orderfoods_app;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.icu.text.TimeZoneFormat;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.valdesekamdem.library.mdtoast.MDToast;
+
+import io.paperdb.Paper;
+import it.hueic.kenhoang.orderfoods_app.common.Common;
+import it.hueic.kenhoang.orderfoods_app.model.User;
 
 public class MainActivity extends AppCompatActivity {
     private Button mBtnSignIn, mBtnSignUp;
     private TextView tvSlogan;
+    DatabaseReference mDataUser;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,8 +36,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         //InitViews
         initViews();
+        //Init Paper
+        Paper.init(this);
         //InitEvents
         initEvents();
+        //CheckRemember
+        checkRemember();
     }
 
     private void initEvents() {
@@ -40,6 +60,64 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(signUpIntent);
             }
         });
+    }
+
+    private void checkRemember() {
+        //Check remember
+        String user = Paper.book().read(Common.USER_KEY);
+        String pwd = Paper.book().read(Common.PWD_KEY);
+
+        if (user != null & pwd != null) {
+            if (!user.isEmpty() && !pwd.isEmpty()) login(user, pwd);
+        }
+    }
+    /**
+     * Auto login
+     * @param phone
+     * @param pwd
+     */
+    private void login(final String phone, final String pwd) {
+        //Just copy login code from SignInActivity
+        //InitFireBase
+        mDataUser = FirebaseDatabase.getInstance().getReference("User");
+        if (Common.isConnectedToInternet(getBaseContext())) {
+            final ProgressDialog mProgressbar = new ProgressDialog(MainActivity.this);
+            mProgressbar.setMessage("Logging ...");
+            mProgressbar.show();
+            mDataUser.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    //Check if user not exist in database
+                    if (dataSnapshot.child(phone).exists()) {
+                        //Get User information
+                        mProgressbar.dismiss();
+                        User user = dataSnapshot
+                                .child(phone)
+                                .getValue(User.class);
+                        if (user.getPassword().equals(pwd)) {
+                            user.setPhone(phone);//Set phone
+                            Intent homeIntent = new Intent(MainActivity.this, HomeActivity.class);
+                            Common.currentUser = user;
+                            startActivity(homeIntent);
+                            finish();
+                        } else {
+                            Snackbar.make(findViewById(R.id.relSignInMain), "Wrong password ...", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        mProgressbar.dismiss();
+                        Snackbar.make(findViewById(R.id.relSignInMain), "User not exists database ...", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        } else {
+            MDToast.makeText(MainActivity.this, "Please check your connection ...", MDToast.LENGTH_SHORT, MDToast.TYPE_WARNING).show();
+            return;
+        }
     }
 
     private void initViews() {

@@ -45,6 +45,10 @@ dependencies {
     implementation 'com.github.mancj:MaterialSearchBar:0.7.5'
     //Material Toast
     implementation 'com.valdesekamdem.library:md-toast:0.9.0'
+    //PaperDB
+    implementation 'io.paperdb:paperdb:2.6'
+    //Material RadioButton
+    implementation 'com.github.rey5137:material:1.2.4'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'

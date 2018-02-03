@@ -15,8 +15,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.rengwuxian.materialedittext.MaterialEditText;
+import com.rey.material.widget.CheckBox;
 import com.valdesekamdem.library.mdtoast.MDToast;
 
+import io.paperdb.Paper;
 import it.hueic.kenhoang.orderfoods_app.common.Common;
 import it.hueic.kenhoang.orderfoods_app.model.User;
 
@@ -25,6 +27,7 @@ public class SignInActivity extends AppCompatActivity {
     private ProgressDialog mProgressbar;
     private Button btnSignIn;
     private DatabaseReference mDataUser;
+    private CheckBox chkRemember;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().getDecorView().setSystemUiVisibility(
@@ -34,6 +37,8 @@ public class SignInActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sign_in);
         //InitViews
         initViews();
+        //Init Paper
+        Paper.init(this);
         //InitFireBase
         mDataUser = FirebaseDatabase.getInstance().getReference("User");
         //InitEvents
@@ -45,6 +50,11 @@ public class SignInActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (Common.isConnectedToInternet(getBaseContext())) {
+                    //Save user & password
+                    if (chkRemember.isChecked()) {
+                        Paper.book().write(Common.USER_KEY, edPhone.getText().toString());
+                        Paper.book().write(Common.PWD_KEY, edPass.getText().toString());
+                    }
                     mProgressbar.setMessage("Logging ...");
                     mProgressbar.show();
                     mDataUser.addValueEventListener(new ValueEventListener() {
@@ -60,7 +70,6 @@ public class SignInActivity extends AppCompatActivity {
                                 if (user.getPassword().equals(edPass.getText().toString())) {
                                     user.setPhone(edPhone.getText().toString());//Set phone
                                     Intent homeIntent = new Intent(SignInActivity.this, HomeActivity.class);
-                                    ;
                                     Common.currentUser = user;
                                     startActivity(homeIntent);
                                     finish();
@@ -90,6 +99,7 @@ public class SignInActivity extends AppCompatActivity {
         edPhone         = findViewById(R.id.edPhone);
         edPass          = findViewById(R.id.edPass);
         btnSignIn       = findViewById(R.id.btnSignIn);
+        chkRemember     = findViewById(R.id.chkRemember);
         mProgressbar    = new ProgressDialog(this);
     }
 }
