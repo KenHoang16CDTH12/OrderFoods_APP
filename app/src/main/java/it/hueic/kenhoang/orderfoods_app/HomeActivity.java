@@ -22,6 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 import com.valdesekamdem.library.mdtoast.MDToast;
 
+import io.paperdb.Paper;
 import it.hueic.kenhoang.orderfoods_app.Interface.ItemClickListener;
 import it.hueic.kenhoang.orderfoods_app.adapter.ViewHolder.MenuViewHolder;
 import it.hueic.kenhoang.orderfoods_app.common.Common;
@@ -33,7 +34,7 @@ public class HomeActivity extends AppCompatActivity
     //View
     TextView tvFullName, tvTitle;
     private DatabaseReference mCategoryData;
-    private RecyclerView recyler_menu;
+    private RecyclerView recycler_menu;
     private RecyclerView.LayoutManager mLayoutManger;
     private FirebaseRecyclerAdapter<Category, MenuViewHolder> adapter;
     @Override
@@ -53,7 +54,8 @@ public class HomeActivity extends AppCompatActivity
         startService(serviceIntent);
         //Init FireBase
         mCategoryData   = FirebaseDatabase.getInstance().getReference("Category");
-
+        //Init Paper
+        Paper.init(this);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,10 +79,10 @@ public class HomeActivity extends AppCompatActivity
         tvFullName.setText(Common.currentUser.getName());
 
         //Load menu
-        recyler_menu    = findViewById(R.id.recycler_menu);
+        recycler_menu    = findViewById(R.id.recycler_menu);
         mLayoutManger   = new LinearLayoutManager(this);
-        recyler_menu.setHasFixedSize(true);
-        recyler_menu.setLayoutManager(mLayoutManger);
+        recycler_menu.setHasFixedSize(true);
+        recycler_menu.setLayoutManager(mLayoutManger);
         //Check connect internet
         if (Common.isConnectedToInternet(this)) loadMenu();
         else {
@@ -115,7 +117,7 @@ public class HomeActivity extends AppCompatActivity
                 });
             }
         };
-        recyler_menu.setAdapter(adapter);
+        recycler_menu.setAdapter(adapter);
     }
 
     @Override
@@ -164,6 +166,8 @@ public class HomeActivity extends AppCompatActivity
         } else if (id == R.id.nav_orders) {
             startActivity(new Intent(HomeActivity.this, OrderStatusActivity.class));
         } else if (id == R.id.nav_log_out) {
+            //Remove remember user & password
+            Paper.book().destroy();
             //Logout
             Intent signInIntent = new Intent(HomeActivity.this, SignInActivity.class);
             signInIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
