@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -63,6 +64,7 @@ public class CartActivity extends AppCompatActivity {
     private void loadListCart() {
         carts = new Database(this).getCarts();
         adapter = new CartAdapter(carts, this);
+        adapter.notifyDataSetChanged();
         listCarts.setAdapter(adapter);
         //Calculate total price
         int total = 0;
@@ -143,5 +145,27 @@ public class CartActivity extends AppCompatActivity {
         relMainCart = findViewById(R.id.relMainCart);
         tvTotalPrice = findViewById(R.id.total);
         btnPlace = findViewById(R.id.btnPlaceOrder);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        if (item.getTitle().equals(Common.DELETE)) deleteCart(item.getOrder());
+
+        return super.onContextItemSelected(item);
+    }
+
+    /**
+     * Delete carts in SQLite
+     * @param position
+     */
+    private void deleteCart(int position) {
+        //We will remove item at List<Order> by position
+        carts.remove(position);
+        //After that, we will delete all old data from SQLite
+        new Database(this).cleanCart();
+        //And final, we will update new data from List<Order> to SQLite
+        for (Order item: carts) new Database(this).addToCart(item);
+        //Refresh
+        loadListCart();
     }
 }

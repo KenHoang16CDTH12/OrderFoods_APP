@@ -18,7 +18,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+import com.valdesekamdem.library.mdtoast.MDToast;
 
+import it.hueic.kenhoang.orderfoods_app.common.Common;
 import it.hueic.kenhoang.orderfoods_app.database.Database;
 import it.hueic.kenhoang.orderfoods_app.model.Food;
 import it.hueic.kenhoang.orderfoods_app.model.Order;
@@ -49,7 +51,13 @@ public class FoodDetailActivity extends AppCompatActivity {
         //Get food id from intent
         if (getIntent() != null)
             foodId = getIntent().getStringExtra("FoodId");
-        if (!foodId.isEmpty()) getDetailFood(foodId);
+        if (!foodId.isEmpty()) {
+            if (Common.isConnectedToInternet(getBaseContext())) getDetailFood(foodId);
+            else {
+                MDToast.makeText(FoodDetailActivity.this, "Please check your connection ...", MDToast.LENGTH_SHORT, MDToast.TYPE_WARNING).show();
+                return;
+            }
+        }
         //InitEvent
         initEvent();
     }

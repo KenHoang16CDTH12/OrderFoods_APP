@@ -15,6 +15,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.rengwuxian.materialedittext.MaterialEditText;
+import com.valdesekamdem.library.mdtoast.MDToast;
 
 import it.hueic.kenhoang.orderfoods_app.common.Common;
 import it.hueic.kenhoang.orderfoods_app.model.User;
@@ -43,38 +44,44 @@ public class SignInActivity extends AppCompatActivity {
         btnSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mProgressbar.setMessage("Logging ...");
-                mProgressbar.show();
-                mDataUser.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        //Check if user not exist in database
-                        if (dataSnapshot.child(edPhone.getText().toString()).exists()) {
-                            //Get User information
-                            mProgressbar.dismiss();
-                            User user = dataSnapshot
-                                    .child(edPhone.getText().toString())
-                                    .getValue(User.class);
-                            if (user.getPassword().equals(edPass.getText().toString())) {
-                                user.setPhone(edPhone.getText().toString());//Set phone
-                                Intent homeIntent = new Intent(SignInActivity.this, HomeActivity.class);;
-                                Common.currentUser = user;
-                                startActivity(homeIntent);
-                                finish();
+                if (Common.isConnectedToInternet(getBaseContext())) {
+                    mProgressbar.setMessage("Logging ...");
+                    mProgressbar.show();
+                    mDataUser.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            //Check if user not exist in database
+                            if (dataSnapshot.child(edPhone.getText().toString()).exists()) {
+                                //Get User information
+                                mProgressbar.dismiss();
+                                User user = dataSnapshot
+                                        .child(edPhone.getText().toString())
+                                        .getValue(User.class);
+                                if (user.getPassword().equals(edPass.getText().toString())) {
+                                    user.setPhone(edPhone.getText().toString());//Set phone
+                                    Intent homeIntent = new Intent(SignInActivity.this, HomeActivity.class);
+                                    ;
+                                    Common.currentUser = user;
+                                    startActivity(homeIntent);
+                                    finish();
+                                } else {
+                                    Snackbar.make(findViewById(R.id.relSignInMain), "Wrong password ...", Toast.LENGTH_SHORT).show();
+                                }
                             } else {
-                                Snackbar.make(findViewById(R.id.relSignInMain), "Wrong password ...", Toast.LENGTH_SHORT).show();
+                                mProgressbar.dismiss();
+                                Snackbar.make(findViewById(R.id.relSignInMain), "User not exists database ...", Toast.LENGTH_SHORT).show();
                             }
-                        } else {
-                            mProgressbar.dismiss();
-                            Snackbar.make(findViewById(R.id.relSignInMain), "User not exists database ...", Toast.LENGTH_SHORT).show();
                         }
-                    }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-                    }
-                });
+                        }
+                    });
+                } else {
+                    MDToast.makeText(SignInActivity.this, "Please check your connection ...", MDToast.LENGTH_SHORT, MDToast.TYPE_WARNING).show();
+                    return;
+                }
             }
         });
     }

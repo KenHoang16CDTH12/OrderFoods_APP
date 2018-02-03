@@ -20,6 +20,7 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
+import com.valdesekamdem.library.mdtoast.MDToast;
 
 import it.hueic.kenhoang.orderfoods_app.Interface.ItemClickListener;
 import it.hueic.kenhoang.orderfoods_app.adapter.ViewHolder.MenuViewHolder;
@@ -80,9 +81,12 @@ public class HomeActivity extends AppCompatActivity
         mLayoutManger   = new LinearLayoutManager(this);
         recyler_menu.setHasFixedSize(true);
         recyler_menu.setLayoutManager(mLayoutManger);
-
-        loadMenu();
-
+        //Check connect internet
+        if (Common.isConnectedToInternet(this)) loadMenu();
+        else {
+            MDToast.makeText(HomeActivity.this, "Please check your connection ...", MDToast.LENGTH_SHORT, MDToast.TYPE_WARNING).show();
+            return;
+        }
 
     }
 
@@ -136,8 +140,12 @@ public class HomeActivity extends AppCompatActivity
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
+        int id = item.getItemId(); if (id == R.id.refresh) {
+            if (Common.isConnectedToInternet(this)) loadMenu();
+            else {
+                MDToast.makeText(HomeActivity.this, "Please check your connection ...", MDToast.LENGTH_SHORT, MDToast.TYPE_WARNING).show();
+            }
+        }
         //noinspection SimplifiableIfStatement
 
         return super.onOptionsItemSelected(item);
