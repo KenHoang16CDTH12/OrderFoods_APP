@@ -20,7 +20,7 @@ import it.hueic.kenhoang.orderfoods_app.common.Common;
 import it.hueic.kenhoang.orderfoods_app.model.User;
 
 public class SignUpActivity extends AppCompatActivity {
-    private MaterialEditText edPhone, edPass, edName;
+    private MaterialEditText edPhone, edPass, edName, edSecureCode;
     private ProgressDialog mProgressbar;
     private Button btnSignUp;
     private DatabaseReference mDataUser;
@@ -54,7 +54,7 @@ public class SignUpActivity extends AppCompatActivity {
                                 Snackbar.make(findViewById(R.id.relSignUpMain), "Phone number already register ...", Toast.LENGTH_SHORT).show();
                             } else {
                                 mProgressbar.dismiss();
-                                User user = new User(edName.getText().toString(), edPass.getText().toString());
+                                User user = new User(edName.getText().toString(), edPass.getText().toString(), edSecureCode.getText().toString());
                                 mDataUser.child(edPhone.getText().toString()).setValue(user);
                                 Toast.makeText(getBaseContext(), "Sign up successfully ...", Toast.LENGTH_SHORT).show();
                                 finish();
@@ -78,6 +78,7 @@ public class SignUpActivity extends AppCompatActivity {
         edName          = findViewById(R.id.edName);
         edPhone         = findViewById(R.id.edPhone);
         edPass          = findViewById(R.id.edPass);
+        edSecureCode    = findViewById(R.id.edSecureCode);
         btnSignUp       = findViewById(R.id.btnSignUp);
         mProgressbar    = new ProgressDialog(this);
     }
