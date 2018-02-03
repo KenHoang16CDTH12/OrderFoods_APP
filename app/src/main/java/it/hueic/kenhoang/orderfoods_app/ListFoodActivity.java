@@ -18,12 +18,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.squareup.picasso.Picasso;
+import com.valdesekamdem.library.mdtoast.MDToast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import it.hueic.kenhoang.orderfoods_app.Interface.ItemClickListener;
 import it.hueic.kenhoang.orderfoods_app.adapter.ViewHolder.FoodVIewHolder;
+import it.hueic.kenhoang.orderfoods_app.common.Common;
 import it.hueic.kenhoang.orderfoods_app.model.Food;
 
 public class ListFoodActivity extends AppCompatActivity {
@@ -50,7 +52,14 @@ public class ListFoodActivity extends AppCompatActivity {
         initView();
         //Get Intent here
         if (getIntent() != null) categoryId = getIntent().getStringExtra("CategoryId");
-        if (!categoryId.isEmpty() && categoryId != null) loadListFood(categoryId);
+        if (!categoryId.isEmpty() && categoryId != null) {
+            //Check connect internet
+            if (Common.isConnectedToInternet(getBaseContext())) loadListFood(categoryId);
+            else {
+                MDToast.makeText(ListFoodActivity.this, "Please check your connection ...", MDToast.LENGTH_SHORT, MDToast.TYPE_WARNING).show();
+                return;
+            }
+        }
         //SearchBar
         handleSearchBar();
     }

@@ -14,7 +14,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.rengwuxian.materialedittext.MaterialEditText;
+import com.valdesekamdem.library.mdtoast.MDToast;
 
+import it.hueic.kenhoang.orderfoods_app.common.Common;
 import it.hueic.kenhoang.orderfoods_app.model.User;
 
 public class SignUpActivity extends AppCompatActivity {
@@ -41,28 +43,33 @@ public class SignUpActivity extends AppCompatActivity {
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mProgressbar.setMessage("Please waiting ....");
-                mProgressbar.show();
-                mDataUser.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.child(edPhone.getText().toString()).exists()) {
-                            mProgressbar.dismiss();
-                            Snackbar.make(findViewById(R.id.relSignUpMain), "Phone number already register ...", Toast.LENGTH_SHORT).show();
-                        } else {
-                            mProgressbar.dismiss();
-                            User user = new User(edName.getText().toString(), edPass.getText().toString());
-                            mDataUser.child(edPhone.getText().toString()).setValue(user);
-                            Toast.makeText(getBaseContext(), "Sign up successfully ...", Toast.LENGTH_SHORT).show();
-                            finish();
+                if (Common.isConnectedToInternet(getBaseContext())) {
+                    mProgressbar.setMessage("Please waiting ....");
+                    mProgressbar.show();
+                    mDataUser.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.child(edPhone.getText().toString()).exists()) {
+                                mProgressbar.dismiss();
+                                Snackbar.make(findViewById(R.id.relSignUpMain), "Phone number already register ...", Toast.LENGTH_SHORT).show();
+                            } else {
+                                mProgressbar.dismiss();
+                                User user = new User(edName.getText().toString(), edPass.getText().toString());
+                                mDataUser.child(edPhone.getText().toString()).setValue(user);
+                                Toast.makeText(getBaseContext(), "Sign up successfully ...", Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-                    }
-                });
+                        }
+                    });
+                } else {
+                    MDToast.makeText(SignUpActivity.this, "Please check your connection ...", MDToast.LENGTH_SHORT, MDToast.TYPE_WARNING).show();
+                    return;
+                }
             }
         });
     }

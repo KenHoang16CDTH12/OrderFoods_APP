@@ -43,6 +43,8 @@ dependencies {
     implementation 'com.readystatesoftware.sqliteasset:sqliteassethelper:+'
     //MaterialSearchBar
     implementation 'com.github.mancj:MaterialSearchBar:0.7.5'
+    //Material Toast
+    implementation 'com.valdesekamdem.library:md-toast:0.9.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
