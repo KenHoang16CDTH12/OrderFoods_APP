@@ -70,4 +70,49 @@ public class Database extends SQLiteAssetHelper {
         String query = "DELETE FROM OrderDetail";
         db.execSQL(query);
     }
+
+    //Favorites
+    public void addToFavorites(String foodId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = String.format("INSERT INTO Favorites(FoodId) VALUES ('%s');", foodId);
+        db.execSQL(query);
+    }
+
+    public void removeFromFavorites(String foodId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = String.format("DELETE FROM Favorites WHERE FoodId = '%s';", foodId);
+        db.execSQL(query);
+    }
+
+    public boolean isFavorite(String foodId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = String.format("SELECT * FROM Favorites WHERE FoodId='%s'", foodId);
+        Cursor cursor = db.rawQuery(query, null);
+        if (cursor.getCount() <= 0) {
+            cursor.close();
+            return false;
+        }
+        cursor.close();
+        return true;
+    }
+
+    public List<String> getIdFoods() {
+        SQLiteDatabase db = getReadableDatabase();
+        SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+
+        String[] sqlSelect = {"FoodId"};
+        String sqlTable    = "Favorites";
+
+        qb.setTables(sqlTable);
+
+        Cursor cursor = qb.query(db, sqlSelect, null, null, null, null, null);
+        final List<String> result = new ArrayList<>();
+        if (cursor.moveToFirst()) {
+            do {
+                result.add(cursor.getString(cursor.getColumnIndex(sqlSelect[0])));
+
+            } while (cursor.moveToNext());
+        }
+        return result;
+    }
 }

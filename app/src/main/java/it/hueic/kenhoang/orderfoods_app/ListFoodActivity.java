@@ -11,6 +11,7 @@ import android.text.TextWatcher;
 import android.view.View;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -26,6 +27,8 @@ import java.util.List;
 import it.hueic.kenhoang.orderfoods_app.Interface.ItemClickListener;
 import it.hueic.kenhoang.orderfoods_app.adapter.ViewHolder.FoodVIewHolder;
 import it.hueic.kenhoang.orderfoods_app.common.Common;
+import it.hueic.kenhoang.orderfoods_app.database.Database;
+import it.hueic.kenhoang.orderfoods_app.model.Favorite;
 import it.hueic.kenhoang.orderfoods_app.model.Food;
 
 public class ListFoodActivity extends AppCompatActivity {
@@ -39,6 +42,7 @@ public class ListFoodActivity extends AppCompatActivity {
     FirebaseRecyclerAdapter<Food, FoodVIewHolder> searchAdapter;
     List<String> suggestList = new ArrayList<>();
     MaterialSearchBar materialSearchBar;
+    Database localDB;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +52,8 @@ public class ListFoodActivity extends AppCompatActivity {
         setContentView(R.layout.activity_list_food);
         //InitFireBase
         mFoodData   = FirebaseDatabase.getInstance().getReference().child("Foods");
+        //Local DB
+        localDB = new Database(this);
         //InitView
         initView();
         //Get Intent here
@@ -133,6 +139,8 @@ public class ListFoodActivity extends AppCompatActivity {
                         .load(model.getImage())
                         .into(viewHolder.imgFood);
                 final Food local = model;
+                //Add favorite food
+                favoriteFood(searchAdapter, position, viewHolder, model);
                 viewHolder.setItemClickListener(new ItemClickListener() {
                     @Override
                     public void onClick(View view, int position, boolean isLongClick) {
@@ -177,11 +185,13 @@ public class ListFoodActivity extends AppCompatActivity {
                 //Like: Select * From Foods where MenuId = ?
         ) {
             @Override
-            protected void populateViewHolder(FoodVIewHolder viewHolder, Food model, int position) {
+            protected void populateViewHolder(final FoodVIewHolder viewHolder, final Food model, final int position) {
                 viewHolder.tvFoodName.setText(model.getName());
                 Picasso.with(getBaseContext())
                         .load(model.getImage())
                         .into(viewHolder.imgFood);
+                //Add favorite food
+                favoriteFood(adapter, position, viewHolder, model);
                 final Food local = model;
                 viewHolder.setItemClickListener(new ItemClickListener() {
                     @Override
@@ -203,5 +213,26 @@ public class ListFoodActivity extends AppCompatActivity {
         recycler_food.setHasFixedSize(true);
         mLayoutManager  = new LinearLayoutManager(this);
         recycler_food.setLayoutManager(mLayoutManager);
+    }
+
+    private void favoriteFood(final FirebaseRecyclerAdapter<Food, FoodVIewHolder> adapter, final int position, final FoodVIewHolder viewHolder, final Food model) {
+        //Add Favorites
+        if (localDB.isFavorite(this.adapter.getRef(position).getKey()))
+            viewHolder.imgFav.setImageResource(R.drawable.ic_favorite_black_24dp);
+        //Click to change state of Favorites
+        viewHolder.imgFav.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!localDB.isFavorite(ListFoodActivity.this.adapter.getRef(position).getKey())) {
+                    localDB.addToFavorites(ListFoodActivity.this.adapter.getRef(position).getKey());
+                    viewHolder.imgFav.setImageResource(R.drawable.ic_favorite_black_24dp);
+                    Common.showSnackBar("" + model.getName() + " was added to Favorites", ListFoodActivity.this, findViewById(R.id.listfoodMain));
+                } else {
+                    localDB.removeFromFavorites(ListFoodActivity.this.adapter.getRef(position).getKey());
+                    viewHolder.imgFav.setImageResource(R.drawable.ic_favorite_border_black_24dp);
+                    Common.showSnackBar("" + model.getName() + " was remove from to Favorites", ListFoodActivity.this, findViewById(R.id.listfoodMain));
+                }
+            }
+        });
     }
 }

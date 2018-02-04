@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:background="@drawable/foodbg2"
+    android:background="@drawable/bg_color_food_2"
     tools:context="it.hueic.kenhoang.orderfoods_app.CartActivity">
     <include layout="@layout/toolbar"/>
     <RelativeLayout

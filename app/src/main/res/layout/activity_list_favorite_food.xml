@@ -3,20 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:fitsSystemWindows="true"
-    android:id="@+id/listfoodMain"
-    android:background="@drawable/bg_color_food_4"
+    android:id="@+id/listFavoritefoodMain"
+    android:background="@drawable/bg_color_food_5"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="it.hueic.kenhoang.orderfoods_app.ListFoodActivity">
-    <com.mancj.materialsearchbar.MaterialSearchBar
-        android:id="@+id/searchBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:mt_speechMode="false"
-        app:mt_hint="Enter your food"
-        app:mt_placeholder="Search food ..."
-         />
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_food"
         android:layout_marginTop="10dp"
