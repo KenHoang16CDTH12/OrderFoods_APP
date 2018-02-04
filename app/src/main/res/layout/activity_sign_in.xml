@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:id="@+id/relSignInMain"
-    android:background="@drawable/foodbg2"
+    android:background="@drawable/bg_color_food_6"
     tools:context="it.hueic.kenhoang.orderfoods_app.SignInActivity">
     <TextView
         android:text="Sign In"

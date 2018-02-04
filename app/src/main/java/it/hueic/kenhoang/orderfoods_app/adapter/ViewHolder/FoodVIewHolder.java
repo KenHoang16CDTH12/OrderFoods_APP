@@ -2,6 +2,7 @@ package it.hueic.kenhoang.orderfoods_app.adapter.ViewHolder;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.flaviofaria.kenburnsview.KenBurnsView;
@@ -16,11 +17,14 @@ import it.hueic.kenhoang.orderfoods_app.R;
 public class FoodVIewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
     public TextView tvFoodName;
     public KenBurnsView imgFood;
+    public ImageView imgFav;
     private ItemClickListener itemClickListener;
     public FoodVIewHolder(View itemView) {
         super(itemView);
         tvFoodName  = itemView.findViewById(R.id.food_name);
         imgFood  = itemView.findViewById(R.id.food_image);
+        imgFav  = itemView.findViewById(R.id.fav);
+
         itemView.setOnClickListener(this);
     }
 

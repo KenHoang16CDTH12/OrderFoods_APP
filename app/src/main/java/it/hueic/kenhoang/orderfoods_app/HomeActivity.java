@@ -160,8 +160,14 @@ public class HomeActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_menu) {
-
-        } else if (id == R.id.nav_cart) {
+            if (Common.isConnectedToInternet(this)) loadMenu();
+            else {
+                MDToast.makeText(HomeActivity.this, "Please check your connection ...", MDToast.LENGTH_SHORT, MDToast.TYPE_WARNING).show();
+            }
+        } else if (id == R.id.nav_fav) {
+            startActivity(new Intent(HomeActivity.this, ListFavoriteFoodActivity.class));
+        }
+          else if (id == R.id.nav_cart) {
             startActivity(new Intent(HomeActivity.this, CartActivity.class));
         } else if (id == R.id.nav_orders) {
             startActivity(new Intent(HomeActivity.this, OrderStatusActivity.class));

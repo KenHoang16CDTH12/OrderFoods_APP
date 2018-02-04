@@ -5,7 +5,7 @@
     android:id="@+id/coordinatorMain"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/foodbg1"
+    android:background="@drawable/bg_color_food_6"
     tools:context="it.hueic.kenhoang.orderfoods_app.FoodDetailActivity">
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar_layout"

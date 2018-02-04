@@ -10,7 +10,7 @@
         <com.flaviofaria.kenburnsview.KenBurnsView
             android:id="@+id/menu_image"
             android:scaleType="centerCrop"
-            android:src="@drawable/foodbg2"
+            android:src="@drawable/bg_color_food_1"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
         <TextView

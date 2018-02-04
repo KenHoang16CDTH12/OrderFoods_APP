@@ -1,5 +1,7 @@
 package it.hueic.kenhoang.orderfoods_app.model;
 
+import java.util.List;
+
 /**
  * Created by kenhoang on 27/01/2018.
  */

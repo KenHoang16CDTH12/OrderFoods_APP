@@ -1,9 +1,14 @@
 package it.hueic.kenhoang.orderfoods_app.common;
 
+import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.design.widget.Snackbar;
+import android.view.View;
+import android.widget.Toast;
 
+import it.hueic.kenhoang.orderfoods_app.R;
 import it.hueic.kenhoang.orderfoods_app.model.User;
 
 /**
@@ -52,5 +57,10 @@ public class Common {
             }
         }
         return false;
+    }
+
+    public static void showSnackBar(String msg, Activity context, View view){
+        Snackbar.make(context.findViewById(view.getId()), msg, Toast.LENGTH_SHORT)
+                .show();
     }
 }
