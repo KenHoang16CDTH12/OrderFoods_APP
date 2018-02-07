@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,25 +17,32 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+import com.stepstone.apprating.AppRatingDialog;
+import com.stepstone.apprating.listener.RatingDialogListener;
 import com.valdesekamdem.library.mdtoast.MDToast;
+
+import java.util.Arrays;
 
 import it.hueic.kenhoang.orderfoods_app.common.Common;
 import it.hueic.kenhoang.orderfoods_app.database.Database;
 import it.hueic.kenhoang.orderfoods_app.model.Food;
 import it.hueic.kenhoang.orderfoods_app.model.Order;
+import it.hueic.kenhoang.orderfoods_app.model.Rating;
 
-public class FoodDetailActivity extends AppCompatActivity {
+public class FoodDetailActivity extends AppCompatActivity implements RatingDialogListener {
     TextView food_name, food_price, food_description;
     KenBurnsView food_image;
     CollapsingToolbarLayout collapsingToolbarLayout;
-    FloatingActionButton btnCart;
+    FloatingActionButton btnCart, btnRating;
     ElegantNumberButton numberButton;
-
+    RatingBar ratingBar;
     String foodId = "";
 
     DatabaseReference mDataFood;
+    DatabaseReference mDataRating;
 
     Food currentFood;
     @Override
@@ -46,13 +54,17 @@ public class FoodDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_food_detail);
         //InitFireBase
         mDataFood = FirebaseDatabase.getInstance().getReference("Foods");
+        mDataRating = FirebaseDatabase.getInstance().getReference("Rating");
         //InitView
         initView();
         //Get food id from intent
         if (getIntent() != null)
             foodId = getIntent().getStringExtra("FoodId");
         if (!foodId.isEmpty()) {
-            if (Common.isConnectedToInternet(getBaseContext())) getDetailFood(foodId);
+            if (Common.isConnectedToInternet(getBaseContext())) {
+                getDetailFood(foodId);
+                getRatingFood(foodId);
+            }
             else {
                 MDToast.makeText(FoodDetailActivity.this, "Please check your connection ...", MDToast.LENGTH_SHORT, MDToast.TYPE_WARNING).show();
                 return;
@@ -60,6 +72,31 @@ public class FoodDetailActivity extends AppCompatActivity {
         }
         //InitEvent
         initEvent();
+    }
+
+    private void getRatingFood(String foodId) {
+        Query foodRating = mDataRating.orderByChild("foodId").equalTo(foodId);
+        foodRating.addValueEventListener(new ValueEventListener() {
+            int count = 0, sum = 0;
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                    Rating item = postSnapshot.getValue(Rating.class);
+                    sum += Integer.parseInt(item.getRateValue());
+                    count++;
+                }
+                if (count != 0) {
+                    float average = sum / count;
+                    ratingBar.setRating(average);
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private void getDetailFood(String foodId) {
@@ -99,11 +136,39 @@ public class FoodDetailActivity extends AppCompatActivity {
                 Snackbar.make(findViewById(R.id.coordinatorMain), "Added to cart ...", Toast.LENGTH_SHORT).show();
             }
         });
+
+        btnRating.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showRatingDialog();
+            }
+        });
+    }
+
+    private void showRatingDialog() {
+        new AppRatingDialog.Builder()
+                .setPositiveButtonText("Submit")
+                .setNegativeButtonText("Cancel")
+                .setNoteDescriptions(Arrays.asList("Very Bad", "Not Good", "Quite Ok", "Very Good", "Excellent"))
+                .setDefaultRating(1)
+                .setTitle("Rate this food")
+                .setDescription("Please select some stars and give your feedback")
+                .setTitleTextColor(R.color.colorPrimary)
+                .setDescriptionTextColor(R.color.colorPrimary)
+                .setHint("Please write your comment here...")
+                .setHintTextColor(R.color.colorAccent)
+                .setCommentTextColor(android.R.color.white)
+                .setCommentBackgroundColor(R.color.colorPrimaryDark)
+                .setWindowAnimation(R.style.RatingDialogFadeAnim)
+                .create(FoodDetailActivity.this)
+                .show();
     }
 
     private void initView() {
         numberButton        = findViewById(R.id.number_button);
         btnCart             = findViewById(R.id.btnCart);
+        btnRating           = findViewById(R.id.btnRating);
+        ratingBar           = findViewById(R.id.ratingBar);
 
         food_description    = findViewById(R.id.food_description);
         food_name           = findViewById(R.id.food_name);
@@ -113,6 +178,45 @@ public class FoodDetailActivity extends AppCompatActivity {
         collapsingToolbarLayout = findViewById(R.id.collapsing);
         collapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.ExpandedAppbar);
         collapsingToolbarLayout.setCollapsedTitleTextAppearance(R.style.CollapsedAppbar);
+
+    }
+
+    @Override
+    public void onPositiveButtonClicked(int value, String comments) {
+        //Get Rating  and upload to firebase
+        final Rating rating = new Rating(Common.currentUser.getPhone(),
+                foodId,
+                String.valueOf(value),
+                comments);
+        mDataRating.child(Common.currentUser.getPhone()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.child(Common.currentUser.getPhone()).exists()) {
+                    //Remove old value  (you can delete or let it be - useless function :D)
+                    mDataRating.child(Common.currentUser.getPhone()).removeValue();
+                    //Update new value
+                    mDataRating.child(Common.currentUser.getPhone()).setValue(rating);
+                } else {
+                    //Create new value
+                    mDataRating.child(Common.currentUser.getPhone()).setValue(rating);
+                }
+                MDToast.makeText(FoodDetailActivity.this, "Thanks you for submit rating !!!", MDToast.LENGTH_SHORT, MDToast.TYPE_SUCCESS).show();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    @Override
+    public void onNegativeButtonClicked() {
+
+    }
+
+    @Override
+    public void onNeutralButtonClicked() {
 
     }
 }
