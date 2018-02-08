@@ -188,26 +188,30 @@ public class FoodDetailActivity extends AppCompatActivity implements RatingDialo
                 foodId,
                 String.valueOf(value),
                 comments);
-        mDataRating.child(Common.currentUser.getPhone()).addValueEventListener(new ValueEventListener() {
+        final String key = Common.currentUser.getPhone() + "food" + foodId;
+        /*mDataRating.child(Common.currentUser.getPhone()).child(key)
+                .addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.child(Common.currentUser.getPhone()).exists()) {
-                    //Remove old value  (you can delete or let it be - useless function :D)
-                    mDataRating.child(Common.currentUser.getPhone()).removeValue();
-                    //Update new value
-                    mDataRating.child(Common.currentUser.getPhone()).setValue(rating);
-                } else {
                     //Create new value
-                    mDataRating.child(Common.currentUser.getPhone()).setValue(rating);
+                if (!dataSnapshot.child(key).exists()) {
+                    mDataRating.child(Common.currentUser.getPhone()).child(key).setValue(rating);
+                } else {
+                    mDataRating.child(Common.currentUser.getPhone()).child(key).removeValue();
+                    mDataRating.child(Common.currentUser.getPhone()).child(key).setValue(rating);
                 }
                 MDToast.makeText(FoodDetailActivity.this, "Thanks you for submit rating !!!", MDToast.LENGTH_SHORT, MDToast.TYPE_SUCCESS).show();
+
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
+        });*/
+        mDataRating.child(key).setValue(rating);
+        MDToast.makeText(FoodDetailActivity.this, "Thanks you for submit rating !!!", MDToast.LENGTH_SHORT, MDToast.TYPE_SUCCESS).show();
+        getRatingFood(foodId);
     }
 
     @Override

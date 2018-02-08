@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.rengwuxian.materialedittext.MaterialEditText;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -90,15 +92,14 @@ public class CartActivity extends AppCompatActivity {
         alertDialog.setTitle("One more step!");
         alertDialog.setMessage("Enter your address: ");
 
-        final EditText edAdress = new EditText(CartActivity.this);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
-        );
-        edAdress.setLayoutParams(lp);
-        alertDialog.setView(edAdress);
-        alertDialog.setIcon(R.drawable.ic_shopping_cart_black_24dp);
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialog_address_comment = inflater.inflate(R.layout.dialog_order_comment_address, null);
+        final MaterialEditText edAddress = dialog_address_comment.findViewById(R.id.edAddress);
+        final MaterialEditText edComment = dialog_address_comment.findViewById(R.id.edComment);
 
+
+        alertDialog.setIcon(R.drawable.ic_shopping_cart_black_24dp);
+        alertDialog.setView(dialog_address_comment);
         alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -106,8 +107,10 @@ public class CartActivity extends AppCompatActivity {
                 Request request = new Request(
                         Common.currentUser.getPhone(),
                         Common.currentUser.getName(),
-                        edAdress.getText().toString().trim(),
+                        edAddress.getText().toString().trim(),
                         tvTotalPrice.getText().toString(),
+                        "0",//Status
+                        edComment.getText().toString().trim(),
                         carts
                 );
                 //Submit to FireBase
