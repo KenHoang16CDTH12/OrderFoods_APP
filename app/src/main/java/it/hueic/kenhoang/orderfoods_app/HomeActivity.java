@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.squareup.picasso.Picasso;
 import com.valdesekamdem.library.mdtoast.MDToast;
 
@@ -27,7 +28,7 @@ import it.hueic.kenhoang.orderfoods_app.Interface.ItemClickListener;
 import it.hueic.kenhoang.orderfoods_app.adapter.ViewHolder.MenuViewHolder;
 import it.hueic.kenhoang.orderfoods_app.common.Common;
 import it.hueic.kenhoang.orderfoods_app.model.Category;
-import it.hueic.kenhoang.orderfoods_app.service.ListerOrder;
+import it.hueic.kenhoang.orderfoods_app.model.Token;
 
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -49,9 +50,6 @@ public class HomeActivity extends AppCompatActivity
         tvTitle         = findViewById(R.id.tvTitle);
         tvTitle.setText("Menu");
         setSupportActionBar(toolbar);
-        //Register Service
-        Intent serviceIntent = new Intent(HomeActivity.this, ListerOrder.class);
-        startService(serviceIntent);
         //Init FireBase
         mCategoryData   = FirebaseDatabase.getInstance().getReference("Category");
         //Init Paper
@@ -90,6 +88,14 @@ public class HomeActivity extends AppCompatActivity
             return;
         }
 
+        if (Common.currentUser != null) updateToken(FirebaseInstanceId.getInstance().getToken());
+
+    }
+
+    private void updateToken(String token) {
+            DatabaseReference tokenDB = FirebaseDatabase.getInstance().getReference("Tokens");
+            Token data = new Token(token, false); //false because this token send from Client app
+            tokenDB.child(Common.currentUser.getPhone()).setValue(data);
     }
 
     private void loadMenu() {
