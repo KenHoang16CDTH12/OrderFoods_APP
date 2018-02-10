@@ -28,13 +28,20 @@
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
                 android:gravity="center"
-                android:layout_weight="9"
+                android:layout_weight="8"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content" />
             <ImageView
                 android:id="@+id/fav"
                 android:src="@drawable/ic_favorite_border_black_24dp"
                 android:tint="@color/pinkColor"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+            <ImageView
+                android:id="@+id/share"
+                android:src="@drawable/ic_share_black_24dp"
+                android:tint="@android:color/white"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content" />

@@ -58,6 +58,8 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     //Progress material design
     implementation 'com.github.d-max:spots-dialog:0.7@aar'
+    //FacebookShare
+    implementation 'com.facebook.android:facebook-share:[4,5)'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'

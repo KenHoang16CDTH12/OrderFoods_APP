@@ -2,22 +2,31 @@ package it.hueic.kenhoang.orderfoods_app;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.graphics.Typeface;
 import android.icu.text.TimeZoneFormat;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.FacebookSdk;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.valdesekamdem.library.mdtoast.MDToast;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import io.paperdb.Paper;
 import it.hueic.kenhoang.orderfoods_app.common.Common;
@@ -33,7 +42,10 @@ public class MainActivity extends AppCompatActivity {
         getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_main);
+        //Facebook SDK
+        //printKeyHash();
         //InitViews
         initViews();
         //Init Paper
@@ -42,6 +54,22 @@ public class MainActivity extends AppCompatActivity {
         initEvents();
         //CheckRemember
         checkRemember();
+    }
+
+    private void printKeyHash() {
+        try {
+            PackageInfo info = getPackageManager().getPackageInfo("it.hueic.kenhoang.orderfoods_app",
+                    PackageManager.GET_SIGNATURES);
+            for (Signature signature: info.signatures) {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                Log.d("KeyHash", "printKeyHash: " + Base64.encodeToString(md.digest(), Base64.DEFAULT));
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
     }
 
     private void initEvents() {
