@@ -1,5 +1,6 @@
 package it.hueic.kenhoang.orderfoods_app;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
@@ -45,6 +46,8 @@ import it.hueic.kenhoang.orderfoods_app.remote.APIService;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class CartActivity extends AppCompatActivity {
     RecyclerView listCarts;
@@ -67,6 +70,11 @@ public class CartActivity extends AppCompatActivity {
         getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        //Notes : add this code before setContentView
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+            .setDefaultFontPath("fonts/restaurant_font.otf")
+            .setFontAttrId(R.attr.fontPath)
+            .build());
         setContentView(R.layout.activity_cart);
         //InitService
         mService = Common.getFCMService();
@@ -78,6 +86,11 @@ public class CartActivity extends AppCompatActivity {
         loadListCart();
         //InitEvent
         initEvent();
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
     private void loadListCart() {

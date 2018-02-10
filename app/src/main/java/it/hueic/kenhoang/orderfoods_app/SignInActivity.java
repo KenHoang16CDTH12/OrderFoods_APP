@@ -2,6 +2,7 @@ package it.hueic.kenhoang.orderfoods_app;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.Snackbar;
@@ -25,6 +26,8 @@ import com.valdesekamdem.library.mdtoast.MDToast;
 import io.paperdb.Paper;
 import it.hueic.kenhoang.orderfoods_app.common.Common;
 import it.hueic.kenhoang.orderfoods_app.model.User;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class SignInActivity extends AppCompatActivity {
     private MaterialEditText edPhone, edPass;
@@ -38,6 +41,11 @@ public class SignInActivity extends AppCompatActivity {
         getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        //Notes : add this code before setContentView
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath("fonts/restaurant_font.otf")
+                .setFontAttrId(R.attr.fontPath)
+                .build());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
         //InitViews
@@ -48,6 +56,11 @@ public class SignInActivity extends AppCompatActivity {
         mDataUser = FirebaseDatabase.getInstance().getReference("User");
         //InitEvents
         initEvents();
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
     private void initEvents() {
