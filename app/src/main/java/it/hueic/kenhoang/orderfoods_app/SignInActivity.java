@@ -62,7 +62,7 @@ public class SignInActivity extends AppCompatActivity {
                     }
                     mProgressbar.setMessage("Logging ...");
                     mProgressbar.show();
-                    mDataUser.addValueEventListener(new ValueEventListener() {
+                    mDataUser.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             //Check if user not exist in database
@@ -78,6 +78,7 @@ public class SignInActivity extends AppCompatActivity {
                                     Common.currentUser = user;
                                     startActivity(homeIntent);
                                     finish();
+                                    mDataUser.removeEventListener(this);
                                 } else {
                                     Snackbar.make(findViewById(R.id.relSignInMain), "Wrong password ...", Toast.LENGTH_SHORT).show();
                                 }

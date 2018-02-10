@@ -1,10 +1,14 @@
 package it.hueic.kenhoang.orderfoods_app;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -17,12 +21,20 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.rengwuxian.materialedittext.MaterialEditText;
 import com.squareup.picasso.Picasso;
 import com.valdesekamdem.library.mdtoast.MDToast;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import dmax.dialog.SpotsDialog;
 import io.paperdb.Paper;
 import it.hueic.kenhoang.orderfoods_app.Interface.ItemClickListener;
 import it.hueic.kenhoang.orderfoods_app.adapter.ViewHolder.MenuViewHolder;
@@ -177,6 +189,9 @@ public class HomeActivity extends AppCompatActivity
             startActivity(new Intent(HomeActivity.this, CartActivity.class));
         } else if (id == R.id.nav_orders) {
             startActivity(new Intent(HomeActivity.this, OrderStatusActivity.class));
+        } else if (id == R.id.nav_change_pass) {
+            //Change password
+            showChangePasswordDialog();
         } else if (id == R.id.nav_log_out) {
             //Remove remember user & password
             Paper.book().destroy();
@@ -188,5 +203,75 @@ public class HomeActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    /**
+     * Change password dialog
+     */
+    private void showChangePasswordDialog() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomeActivity.this);
+        alertDialog.setTitle("CHANGE PASSWORD");
+        alertDialog.setMessage("Please fill all information.");
+        alertDialog.setIcon(R.drawable.ic_security_black_24dp);
+        View dialog_change_password = getLayoutInflater().inflate(R.layout.dialog_change_password, null);
+        alertDialog.setView(dialog_change_password);
+
+        final MaterialEditText edPass = dialog_change_password.findViewById(R.id.edPass);
+        final MaterialEditText edNewPass = dialog_change_password.findViewById(R.id.edNewPass);
+        final MaterialEditText edRepeatPass = dialog_change_password.findViewById(R.id.edRepeatPass);
+
+        //Button
+        alertDialog.setPositiveButton("CHANGE", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //Change password here
+
+                //For use SpotsDialog, please use AlertDialog From android.app, not from v7 like above AlertDialog
+                final AlertDialog waitingDialog = new SpotsDialog(HomeActivity.this);
+                waitingDialog.show();
+
+                //Check old password
+                if (edPass.getText().toString().equals(Common.currentUser.getPassword())) {
+                    //Check new password and repeat password
+                    if (edNewPass.getText().toString().equals(edRepeatPass.getText().toString())) {
+                        Map<String, Object> passwordUpdate = new HashMap<>();
+                        passwordUpdate.put("password", edNewPass.getText().toString());
+                        //Make update
+                        DatabaseReference mUserDB = FirebaseDatabase.getInstance().getReference("User");
+                        mUserDB.child(Common.currentUser.getPhone())
+                                .updateChildren(passwordUpdate)
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        waitingDialog.dismiss();
+                                        MDToast.makeText(HomeActivity.this, "Password was update ", MDToast.LENGTH_SHORT, MDToast.TYPE_SUCCESS).show();
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        waitingDialog.dismiss();
+                                        MDToast.makeText(HomeActivity.this, "ERROR " + e.getMessage(), MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+                                    }
+                                });
+                    } else {
+                        waitingDialog.dismiss();
+                        MDToast.makeText(HomeActivity.this, "New password doesn't match! ", MDToast.LENGTH_SHORT, MDToast.TYPE_WARNING).show();
+                    }
+                } else {
+                    waitingDialog.dismiss();
+                    MDToast.makeText(HomeActivity.this, "Wrong old password", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+                }
+            }
+        });
+
+        alertDialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+
+        alertDialog.show();
     }
 }
