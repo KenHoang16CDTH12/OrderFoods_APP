@@ -1,6 +1,8 @@
 package it.hueic.kenhoang.orderfoods_app;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -8,8 +10,16 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.share.Sharer;
+import com.facebook.share.model.SharePhoto;
+import com.facebook.share.model.SharePhotoContent;
+import com.facebook.share.widget.ShareDialog;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -19,6 +29,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 import com.valdesekamdem.library.mdtoast.MDToast;
 
 import java.util.ArrayList;
@@ -43,6 +54,55 @@ public class ListFoodActivity extends AppCompatActivity {
     List<String> suggestList = new ArrayList<>();
     MaterialSearchBar materialSearchBar;
     Database localDB;
+
+    //Facebook Share
+    CallbackManager callbackManager;
+    ShareDialog shareDialog;
+
+    //Create Target from Picasso
+    Target target = new Target() {
+        @Override
+        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+            //Create photo from bitmap
+            SharePhoto photo = new SharePhoto.Builder()
+                    .setBitmap(bitmap)
+                    .build();
+            if (ShareDialog.canShow(SharePhotoContent.class)) {
+                SharePhotoContent content = new SharePhotoContent.Builder()
+                        .addPhoto(photo)
+                        .build();
+                shareDialog.show(content);
+                shareDialog.registerCallback(callbackManager, new FacebookCallback<Sharer.Result>() {
+                    @Override
+                    public void onSuccess(Sharer.Result result) {
+                        Log.i(TAG, "onSuccess: " + result);
+                    }
+
+                    @Override
+                    public void onCancel() {
+
+                    }
+
+                    @Override
+                    public void onError(FacebookException error) {
+                        Log.e(TAG, "onError: " + error );
+                    }
+                });
+            } else {
+                MDToast.makeText(ListFoodActivity.this, "Please install facebbok app ...", MDToast.LENGTH_SHORT, MDToast.TYPE_WARNING).show();
+            }
+        }
+
+        @Override
+        public void onBitmapFailed(Drawable errorDrawable) {
+
+        }
+
+        @Override
+        public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +110,9 @@ public class ListFoodActivity extends AppCompatActivity {
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         setContentView(R.layout.activity_list_food);
+        //InitFacebook
+        callbackManager = CallbackManager.Factory.create();
+        shareDialog = new ShareDialog(this);
         //InitFireBase
         mFoodData   = FirebaseDatabase.getInstance().getReference().child("Foods");
         //Local DB
@@ -139,6 +202,8 @@ public class ListFoodActivity extends AppCompatActivity {
                         .load(model.getImage())
                         .into(viewHolder.imgFood);
                 final Food local = model;
+                //Click to share
+                shareFacebook(searchAdapter, position, viewHolder, model);
                 //Add favorite food
                 favoriteFood(searchAdapter, position, viewHolder, model);
                 viewHolder.setItemClickListener(new ItemClickListener() {
@@ -190,6 +255,8 @@ public class ListFoodActivity extends AppCompatActivity {
                 Picasso.with(getBaseContext())
                         .load(model.getImage())
                         .into(viewHolder.imgFood);
+                //Click to share
+                shareFacebook(adapter, position, viewHolder, model);
                 //Add favorite food
                 favoriteFood(adapter, position, viewHolder, model);
                 final Food local = model;
@@ -208,6 +275,7 @@ public class ListFoodActivity extends AppCompatActivity {
         recycler_food.setAdapter(adapter);
     }
 
+
     private void initView() {
         recycler_food   = findViewById(R.id.recycler_food);
         recycler_food.setHasFixedSize(true);
@@ -215,6 +283,32 @@ public class ListFoodActivity extends AppCompatActivity {
         recycler_food.setLayoutManager(mLayoutManager);
     }
 
+    /**
+     * Share facebook
+     * @param adapter
+     * @param position
+     * @param viewHolder
+     * @param model
+     */
+    private void shareFacebook(FirebaseRecyclerAdapter<Food, FoodVIewHolder> adapter, int position, FoodVIewHolder viewHolder, final Food model) {
+        viewHolder.imgShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "onClick: Click");
+                Picasso.with(getApplicationContext())
+                        .load(model.getImage())
+                        .into(target);
+            }
+        });
+    }
+
+    /**
+     * Favorite
+     * @param adapter
+     * @param position
+     * @param viewHolder
+     * @param model
+     */
     private void favoriteFood(final FirebaseRecyclerAdapter<Food, FoodVIewHolder> adapter, final int position, final FoodVIewHolder viewHolder, final Food model) {
         //Add Favorites
         if (localDB.isFavorite(this.adapter.getRef(position).getKey()))
@@ -234,5 +328,11 @@ public class ListFoodActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 }
