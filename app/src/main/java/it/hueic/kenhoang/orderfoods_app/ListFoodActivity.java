@@ -1,5 +1,6 @@
 package it.hueic.kenhoang.orderfoods_app;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
@@ -42,6 +43,8 @@ import it.hueic.kenhoang.orderfoods_app.common.Common;
 import it.hueic.kenhoang.orderfoods_app.database.Database;
 import it.hueic.kenhoang.orderfoods_app.model.Favorite;
 import it.hueic.kenhoang.orderfoods_app.model.Food;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class ListFoodActivity extends AppCompatActivity {
     private static final String TAG = ListFoodActivity.class.getSimpleName();
@@ -111,6 +114,11 @@ public class ListFoodActivity extends AppCompatActivity {
         getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        //Notes : add this code before setContentView
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath("fonts/restaurant_font.otf")
+                .setFontAttrId(R.attr.fontPath)
+                .build());
         setContentView(R.layout.activity_list_food);
         //InitFacebook
         callbackManager = CallbackManager.Factory.create();
@@ -138,6 +146,11 @@ public class ListFoodActivity extends AppCompatActivity {
         });
         //SearchBar
         handleSearchBar();
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
     private void checkLoadFoodSwipe() {
@@ -216,6 +229,7 @@ public class ListFoodActivity extends AppCompatActivity {
             @Override
             protected void populateViewHolder(FoodVIewHolder viewHolder, Food model, int position) {
                 viewHolder.tvFoodName.setText(model.getName());
+                viewHolder.tvFoodPrice.setText(String.format("$ %s", model.getPrice().toString()));
                 Picasso.with(getBaseContext())
                         .load(model.getImage())
                         .into(viewHolder.imgFood);
@@ -270,6 +284,7 @@ public class ListFoodActivity extends AppCompatActivity {
             @Override
             protected void populateViewHolder(final FoodVIewHolder viewHolder, final Food model, final int position) {
                 viewHolder.tvFoodName.setText(model.getName());
+                viewHolder.tvFoodPrice.setText(String.format("$ %s", model.getPrice().toString()));
                 Picasso.with(getBaseContext())
                         .load(model.getImage())
                         .into(viewHolder.imgFood);

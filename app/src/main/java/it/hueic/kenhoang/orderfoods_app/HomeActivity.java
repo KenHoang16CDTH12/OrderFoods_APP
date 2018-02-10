@@ -1,12 +1,14 @@
 package it.hueic.kenhoang.orderfoods_app;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -42,6 +44,8 @@ import it.hueic.kenhoang.orderfoods_app.adapter.ViewHolder.MenuViewHolder;
 import it.hueic.kenhoang.orderfoods_app.common.Common;
 import it.hueic.kenhoang.orderfoods_app.model.Category;
 import it.hueic.kenhoang.orderfoods_app.model.Token;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -52,12 +56,19 @@ public class HomeActivity extends AppCompatActivity
     private RecyclerView.LayoutManager mLayoutManger;
     private FirebaseRecyclerAdapter<Category, MenuViewHolder> adapter;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private boolean statusItemList = false;
+    Menu menu;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        //Notes : add this code before setContentView
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath("fonts/restaurant_font.otf")
+                .setFontAttrId(R.attr.fontPath)
+                .build());
         setContentView(R.layout.activity_home);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -92,8 +103,12 @@ public class HomeActivity extends AppCompatActivity
         //Load menu
         recycler_menu    = findViewById(R.id.recycler_menu);
         mLayoutManger   = new LinearLayoutManager(this);
-        recycler_menu.setHasFixedSize(true);
-        recycler_menu.setLayoutManager(mLayoutManger);
+        if (statusItemList) {
+            recycler_menu.setHasFixedSize(true);
+            recycler_menu.setLayoutManager(mLayoutManger);
+        } else {
+            recycler_menu.setLayoutManager(new GridLayoutManager(this, 2));
+        }
         //SwipeRefresh Layout
         swipeRefreshLayout = findViewById(R.id.swipe_layout);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
@@ -129,6 +144,11 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
     private void updateToken(String token) {
             DatabaseReference tokenDB = FirebaseDatabase.getInstance().getReference("Tokens");
             Token data = new Token(token, false); //false because this token send from Client app
@@ -138,7 +158,7 @@ public class HomeActivity extends AppCompatActivity
     private void loadMenu() {
         adapter = new FirebaseRecyclerAdapter<Category, MenuViewHolder>(
                 Category.class,
-                R.layout.item_category_menu,
+                statusItemList ? R.layout.item_category_menu : R.layout.item_category_menu_grid,
                 MenuViewHolder.class,
                 mCategoryData
         ) {
@@ -177,6 +197,7 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+        this.menu = menu;
         getMenuInflater().inflate(R.menu.home, menu);
         return true;
     }
@@ -186,11 +207,18 @@ public class HomeActivity extends AppCompatActivity
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId(); if (id == R.id.refresh) {
-            if (Common.isConnectedToInternet(this)) loadMenu();
-            else {
-                MDToast.makeText(HomeActivity.this, "Please check your connection ...", MDToast.LENGTH_SHORT, MDToast.TYPE_WARNING).show();
+        int id = item.getItemId();
+        if (id == R.id.action_view) {
+            statusItemList = !statusItemList;
+            if (statusItemList) {
+                menu.getItem(0).setIcon(getResources().getDrawable(R.drawable.icon_view_list));
+                recycler_menu.setHasFixedSize(true);
+                recycler_menu.setLayoutManager(mLayoutManger);
+            } else {
+                menu.getItem(0).setIcon(getResources().getDrawable(R.drawable.icon_view_grid));
+                recycler_menu.setLayoutManager(new GridLayoutManager(this, 2));
             }
+            checkLoadMenuSwipe();
         }
         //noinspection SimplifiableIfStatement
 

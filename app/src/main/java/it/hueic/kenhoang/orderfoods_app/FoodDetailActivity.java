@@ -1,5 +1,6 @@
 package it.hueic.kenhoang.orderfoods_app;
 
+import android.content.Context;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -31,6 +32,8 @@ import it.hueic.kenhoang.orderfoods_app.database.Database;
 import it.hueic.kenhoang.orderfoods_app.model.Food;
 import it.hueic.kenhoang.orderfoods_app.model.Order;
 import it.hueic.kenhoang.orderfoods_app.model.Rating;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class FoodDetailActivity extends AppCompatActivity implements RatingDialogListener {
     TextView food_name, food_price, food_description;
@@ -51,6 +54,11 @@ public class FoodDetailActivity extends AppCompatActivity implements RatingDialo
         getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        //Notes : add this code before setContentView
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath("fonts/restaurant_font.otf")
+                .setFontAttrId(R.attr.fontPath)
+                .build());
         setContentView(R.layout.activity_food_detail);
         //InitFireBase
         mDataFood = FirebaseDatabase.getInstance().getReference("Foods");
@@ -72,6 +80,11 @@ public class FoodDetailActivity extends AppCompatActivity implements RatingDialo
         }
         //InitEvent
         initEvent();
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
     private void getRatingFood(String foodId) {

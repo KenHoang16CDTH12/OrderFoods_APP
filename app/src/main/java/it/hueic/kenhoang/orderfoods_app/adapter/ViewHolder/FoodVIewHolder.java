@@ -15,13 +15,14 @@ import it.hueic.kenhoang.orderfoods_app.R;
  */
 
 public class FoodVIewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-    public TextView tvFoodName;
+    public TextView tvFoodName, tvFoodPrice;
     public KenBurnsView imgFood;
     public ImageView imgFav, imgShare;
     private ItemClickListener itemClickListener;
     public FoodVIewHolder(View itemView) {
         super(itemView);
         tvFoodName  = itemView.findViewById(R.id.food_name);
+        tvFoodPrice = itemView.findViewById(R.id.food_price);
         imgFood  = itemView.findViewById(R.id.food_image);
         imgFav  = itemView.findViewById(R.id.fav);
         imgShare = itemView.findViewById(R.id.share);
