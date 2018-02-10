@@ -3,6 +3,7 @@ package it.hueic.kenhoang.orderfoods_app;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -46,6 +47,7 @@ public class ListFoodActivity extends AppCompatActivity {
     private static final String TAG = ListFoodActivity.class.getSimpleName();
     private RecyclerView recycler_food;
     private RecyclerView.LayoutManager mLayoutManager;
+    private SwipeRefreshLayout swipeRefreshLayout;
     DatabaseReference mFoodData;
     String categoryId = "";
     FirebaseRecyclerAdapter<Food, FoodVIewHolder> adapter;
@@ -121,6 +123,24 @@ public class ListFoodActivity extends AppCompatActivity {
         initView();
         //Get Intent here
         if (getIntent() != null) categoryId = getIntent().getStringExtra("CategoryId");
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                checkLoadFoodSwipe();
+                materialSearchBar.disableSearch();
+            }
+        });
+        swipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                checkLoadFoodSwipe();
+            }
+        });
+        //SearchBar
+        handleSearchBar();
+    }
+
+    private void checkLoadFoodSwipe() {
         if (!categoryId.isEmpty() && categoryId != null) {
             //Check connect internet
             if (Common.isConnectedToInternet(getBaseContext())) loadListFood(categoryId);
@@ -129,8 +149,6 @@ public class ListFoodActivity extends AppCompatActivity {
                 return;
             }
         }
-        //SearchBar
-        handleSearchBar();
     }
 
     private void handleSearchBar() {
@@ -273,6 +291,7 @@ public class ListFoodActivity extends AppCompatActivity {
         };
         //Set Adapter
         recycler_food.setAdapter(adapter);
+        swipeRefreshLayout.setRefreshing(false);
     }
 
 
@@ -281,6 +300,12 @@ public class ListFoodActivity extends AppCompatActivity {
         recycler_food.setHasFixedSize(true);
         mLayoutManager  = new LinearLayoutManager(this);
         recycler_food.setLayoutManager(mLayoutManager);
+        swipeRefreshLayout = findViewById(R.id.swipe_layout);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                android.R.color.holo_green_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_blue_dark
+        );
     }
 
     /**
