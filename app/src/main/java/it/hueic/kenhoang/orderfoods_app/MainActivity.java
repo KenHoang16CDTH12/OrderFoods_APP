@@ -152,8 +152,6 @@ public class MainActivity extends AppCompatActivity {
         tvSlogan   = findViewById(R.id.tvSlogan);
         mBtnSignIn = findViewById(R.id.btnSignIn);
         mBtnSignUp = findViewById(R.id.btnSignUp);
-
-        Typeface face = Typeface.createFromAsset(getAssets(), "fonts/NABILA.TTF");
-        tvSlogan.setTypeface(face);
+        tvSlogan.setTypeface(Common.setNabiLaFont(this));
     }
 }

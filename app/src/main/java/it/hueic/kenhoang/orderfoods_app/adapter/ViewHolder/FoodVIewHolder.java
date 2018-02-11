@@ -17,7 +17,7 @@ import it.hueic.kenhoang.orderfoods_app.R;
 public class FoodVIewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
     public TextView tvFoodName, tvFoodPrice;
     public KenBurnsView imgFood;
-    public ImageView imgFav, imgShare;
+    public ImageView imgFav, imgShare, btnQuickCart;
     private ItemClickListener itemClickListener;
     public FoodVIewHolder(View itemView) {
         super(itemView);
@@ -26,6 +26,7 @@ public class FoodVIewHolder extends RecyclerView.ViewHolder implements View.OnCl
         imgFood  = itemView.findViewById(R.id.food_image);
         imgFav  = itemView.findViewById(R.id.fav);
         imgShare = itemView.findViewById(R.id.share);
+        btnQuickCart = itemView.findViewById(R.id.btnQuickCart);
 
         itemView.setOnClickListener(this);
     }

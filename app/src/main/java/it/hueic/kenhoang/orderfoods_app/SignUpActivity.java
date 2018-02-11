@@ -34,7 +34,7 @@ public class SignUpActivity extends AppCompatActivity {
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         //Notes : add this code before setContentView
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/restaurant_font.otf")
+                .setDefaultFontPath("fonts/NABILA.TTF")
                 .setFontAttrId(R.attr.fontPath)
                 .build());
         super.onCreate(savedInstanceState);

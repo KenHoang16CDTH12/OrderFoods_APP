@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -47,6 +49,7 @@ import it.hueic.kenhoang.orderfoods_app.common.Common;
 import it.hueic.kenhoang.orderfoods_app.database.Database;
 import it.hueic.kenhoang.orderfoods_app.model.Favorite;
 import it.hueic.kenhoang.orderfoods_app.model.Food;
+import it.hueic.kenhoang.orderfoods_app.model.Order;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -237,6 +240,8 @@ public class ListFoodActivity extends AppCompatActivity {
                         .load(model.getImage())
                         .into(viewHolder.imgFood);
                 final Food local = model;
+                //Click Quick Cart
+                quickCart(searchAdapter, position, viewHolder, model);
                 //Click to share
                 shareFacebook(searchAdapter, position, viewHolder, model);
                 //Add favorite food
@@ -297,6 +302,8 @@ public class ListFoodActivity extends AppCompatActivity {
                 Picasso.with(getBaseContext())
                         .load(model.getImage())
                         .into(viewHolder.imgFood);
+                //Click Quick Cart
+                quickCart(adapter, position, viewHolder, model);
                 //Click to share
                 shareFacebook(adapter, position, viewHolder, model);
                 //Add favorite food
@@ -326,6 +333,23 @@ public class ListFoodActivity extends AppCompatActivity {
         //Set Adapter
         recycler_food.setAdapter(adapter);
         swipeRefreshLayout.setRefreshing(false);
+    }
+
+    private void quickCart(final FirebaseRecyclerAdapter<Food, FoodVIewHolder> adapter, final int position, FoodVIewHolder viewHolder, final Food model) {
+        viewHolder.btnQuickCart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new Database(getBaseContext()).addToCart(new Order(
+                        adapter.getRef(position).getKey(),
+                        model.getName(),
+                        "1",
+                        model.getPrice(),
+                        model.getDiscount()
+                ));
+                Snackbar.make(findViewById(R.id.listfoodMain), "Added to cart ...", Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
 
@@ -395,4 +419,16 @@ public class ListFoodActivity extends AppCompatActivity {
         callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //Fix click back on FoodDetail and get no item in food list
+        if (adapter != null) adapter.startListening();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        adapter.stopListening();
+    }
 }

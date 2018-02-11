@@ -2,6 +2,7 @@ package it.hueic.kenhoang.orderfoods_app.common;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.design.widget.Snackbar;
@@ -72,5 +73,13 @@ public class Common {
                 .show();
     }
 
-
+    /**
+     * Set font nabila
+     * @param activity
+     * @return
+     */
+    public static Typeface setNabiLaFont(Activity activity) {
+        Typeface face = Typeface.createFromAsset(activity.getAssets(), "fonts/NABILA.TTF");
+        return face;
+    }
 }
