@@ -22,6 +22,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -79,6 +81,8 @@ public class HomeActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
         //Init FireBase
         mCategoryData   = FirebaseDatabase.getInstance().getReference("Category");
+        //Create adapter
+        createAdapter();
         //Init Paper
         Paper.init(this);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -111,6 +115,10 @@ public class HomeActivity extends AppCompatActivity
         } else {
             recycler_menu.setLayoutManager(new GridLayoutManager(this, 2));
         }
+        //Add animation recyclerview
+        LayoutAnimationController controller = AnimationUtils.loadLayoutAnimation(recycler_menu.getContext(),
+                R.anim.layout_fall_down);
+        recycler_menu.setLayoutAnimation(controller);
         //SwipeRefresh Layout
         swipeRefreshLayout = findViewById(R.id.swipe_layout);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
@@ -157,7 +165,11 @@ public class HomeActivity extends AppCompatActivity
             tokenDB.child(Common.currentUser.getPhone()).setValue(data);
     }
 
-    private void loadMenu() {
+    /**
+     * Create adapter
+     */
+
+    private void createAdapter() {
 
         FirebaseRecyclerOptions<Category> options = new FirebaseRecyclerOptions.Builder<Category>()
                 .setQuery(mCategoryData, Category.class)
@@ -189,7 +201,14 @@ public class HomeActivity extends AppCompatActivity
                 return new MenuViewHolder(itemView);
             }
         };
+    }
+    /**
+     * Load Menu
+     */
+    private void loadMenu() {
         adapter.startListening();
+        //Animation
+        recycler_menu.scheduleLayoutAnimation();
         recycler_menu.setAdapter(adapter);
         swipeRefreshLayout.setRefreshing(false);
     }
