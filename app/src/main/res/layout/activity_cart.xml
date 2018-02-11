@@ -31,6 +31,7 @@
             android:layout_height="match_parent">
             <LinearLayout
                 android:layout_margin="8dp"
+                android:id="@+id/linearTotal"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
@@ -52,13 +53,16 @@
 
             <Button
                 android:id="@+id/btnPlaceOrder"
+                android:layout_below="@id/linearTotal"
                 android:text="Place Order"
                 android:textColor="@android:color/white"
-                android:textSize="24sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 android:fontFamily="cursive"
                 android:textAllCaps="false"
-                android:layout_margin="8dp"
+                android:padding="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
                 android:background="@drawable/btn_signin_design"
                 android:layout_alignParentBottom="true"
                 android:layout_width="match_parent"

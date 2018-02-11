@@ -21,9 +21,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -156,14 +158,14 @@ public class HomeActivity extends AppCompatActivity
     }
 
     private void loadMenu() {
-        adapter = new FirebaseRecyclerAdapter<Category, MenuViewHolder>(
-                Category.class,
-                statusItemList ? R.layout.item_category_menu : R.layout.item_category_menu_grid,
-                MenuViewHolder.class,
-                mCategoryData
-        ) {
+
+        FirebaseRecyclerOptions<Category> options = new FirebaseRecyclerOptions.Builder<Category>()
+                .setQuery(mCategoryData, Category.class)
+                .build();
+
+        adapter = new FirebaseRecyclerAdapter<Category, MenuViewHolder>(options) {
             @Override
-            protected void populateViewHolder(MenuViewHolder viewHolder, Category model, int position) {
+            protected void onBindViewHolder(@NonNull MenuViewHolder viewHolder, int position, @NonNull Category model) {
                 viewHolder.tvMenuName.setText(model.getName());
                 Picasso.with(getBaseContext()).load(model.getImage())
                         .into(viewHolder.imgMenu);
@@ -171,7 +173,7 @@ public class HomeActivity extends AppCompatActivity
                 viewHolder.setItemClickListener(new ItemClickListener() {
                     @Override
                     public void onClick(View view, int position, boolean isLongClick) {
-                       //Get CategoryId and send to new Activity
+                        //Get CategoryId and send to new Activity
                         Intent foodListIntent = new Intent(HomeActivity.this, ListFoodActivity.class);
                         //Because CategoryId is key, so we just get key of this item
                         foodListIntent.putExtra("CategoryId", adapter.getRef(position).getKey());
@@ -179,7 +181,15 @@ public class HomeActivity extends AppCompatActivity
                     }
                 });
             }
+
+            @Override
+            public MenuViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                View itemView = LayoutInflater.from(parent.getContext())
+                        .inflate(statusItemList ? R.layout.item_category_menu : R.layout.item_category_menu_grid, parent, false);
+                return new MenuViewHolder(itemView);
+            }
         };
+        adapter.startListening();
         recycler_menu.setAdapter(adapter);
         swipeRefreshLayout.setRefreshing(false);
     }
@@ -328,4 +338,5 @@ public class HomeActivity extends AppCompatActivity
 
         alertDialog.show();
     }
+
 }
