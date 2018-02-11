@@ -26,6 +26,7 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.TextView;
 
+import com.andremion.counterfab.CounterFab;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -46,6 +47,7 @@ import io.paperdb.Paper;
 import it.hueic.kenhoang.orderfoods_app.Interface.ItemClickListener;
 import it.hueic.kenhoang.orderfoods_app.adapter.ViewHolder.MenuViewHolder;
 import it.hueic.kenhoang.orderfoods_app.common.Common;
+import it.hueic.kenhoang.orderfoods_app.database.Database;
 import it.hueic.kenhoang.orderfoods_app.model.Category;
 import it.hueic.kenhoang.orderfoods_app.model.Token;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
@@ -55,6 +57,7 @@ public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     //View
     TextView tvFullName, tvTitle;
+    CounterFab fab;
     private DatabaseReference mCategoryData;
     private RecyclerView recycler_menu;
     private RecyclerView.LayoutManager mLayoutManger;
@@ -85,7 +88,7 @@ public class HomeActivity extends AppCompatActivity
         createAdapter();
         //Init Paper
         Paper.init(this);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -93,6 +96,8 @@ public class HomeActivity extends AppCompatActivity
                 startActivity(cartIntent);
             }
         });
+
+        fab.setCount(new Database(this).getCountCart());
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -302,6 +307,9 @@ public class HomeActivity extends AppCompatActivity
         final MaterialEditText edPass = dialog_change_password.findViewById(R.id.edPass);
         final MaterialEditText edNewPass = dialog_change_password.findViewById(R.id.edNewPass);
         final MaterialEditText edRepeatPass = dialog_change_password.findViewById(R.id.edRepeatPass);
+        edPass.setTypeface(Common.setNabiLaFont(this));
+        edNewPass.setTypeface(Common.setNabiLaFont(this));
+        edRepeatPass.setTypeface(Common.setNabiLaFont(this));
 
         //Button
         alertDialog.setPositiveButton("CHANGE", new DialogInterface.OnClickListener() {
@@ -358,4 +366,16 @@ public class HomeActivity extends AppCompatActivity
         alertDialog.show();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        fab.setCount(new Database(this).getCountCart());
+        if (adapter != null) adapter.startListening();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        adapter.stopListening();
+    }
 }
