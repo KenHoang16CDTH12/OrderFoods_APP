@@ -53,7 +53,7 @@ public class CartActivity extends AppCompatActivity {
     RecyclerView listCarts;
     RecyclerView.LayoutManager mLayoutManager;
     RelativeLayout relMainCart;
-    TextView tvTotalPrice, tvTitle;
+    public TextView tvTotalPrice, tvTitle;
     Button btnPlace;
 
     DatabaseReference mDataRequest;
