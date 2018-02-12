@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
+import com.squareup.picasso.Picasso;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -67,6 +68,10 @@ public class CartAdapter extends RecyclerView.Adapter<CartViewHolder> {
                 (Integer.parseInt(listData.get(position).getQuantity()));
         holder.txt_price.setText(fmt.format(price));
         holder.txt_card_name.setText(listData.get(position).getProductName());
+
+        Picasso.with(activity)
+                .load(listData.get(position).getImage())
+                .into(holder.img_item_cart);
     }
 
     @Override

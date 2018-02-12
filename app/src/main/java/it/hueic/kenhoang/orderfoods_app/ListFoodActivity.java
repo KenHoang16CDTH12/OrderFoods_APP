@@ -344,7 +344,8 @@ public class ListFoodActivity extends AppCompatActivity {
                         model.getName(),
                         "1",
                         model.getPrice(),
-                        model.getDiscount()
+                        model.getDiscount(),
+                        model.getImage()
                 ));
                 Snackbar.make(findViewById(R.id.listfoodMain), "Added to cart ...", Toast.LENGTH_SHORT).show();
             }
