@@ -11,6 +11,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -24,11 +25,16 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.andremion.counterfab.CounterFab;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -55,6 +61,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    private static final String TAG = HomeActivity.class.getSimpleName();
     //View
     TextView tvFullName, tvTitle;
     CounterFab fab;
@@ -65,6 +72,9 @@ public class HomeActivity extends AppCompatActivity
     private SwipeRefreshLayout swipeRefreshLayout;
     private boolean statusItemList = false;
     Menu menu;
+
+    // Address
+    Place homeAddress;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -264,33 +274,115 @@ public class HomeActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
-        if (id == R.id.nav_menu) {
-            if (Common.isConnectedToInternet(this)) loadMenu();
-            else {
-                MDToast.makeText(HomeActivity.this, "Please check your connection ...", MDToast.LENGTH_SHORT, MDToast.TYPE_WARNING).show();
-            }
-        } else if (id == R.id.nav_fav) {
-            startActivity(new Intent(HomeActivity.this, ListFavoriteFoodActivity.class));
-        }
-          else if (id == R.id.nav_cart) {
-            startActivity(new Intent(HomeActivity.this, CartActivity.class));
-        } else if (id == R.id.nav_orders) {
-            startActivity(new Intent(HomeActivity.this, OrderStatusActivity.class));
-        } else if (id == R.id.nav_change_pass) {
-            //Change password
-            showChangePasswordDialog();
-        } else if (id == R.id.nav_log_out) {
-            //Remove remember user & password
-            Paper.book().destroy();
-            //Logout
-            Intent signInIntent = new Intent(HomeActivity.this, SignInActivity.class);
-            signInIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(signInIntent);
+        switch (id) {
+            case R.id.nav_menu:
+                if (Common.isConnectedToInternet(this)) loadMenu();
+                else {
+                    MDToast.makeText(HomeActivity.this, "Please check your connection ...", MDToast.LENGTH_SHORT, MDToast.TYPE_WARNING).show();
+                }
+                break;
+            case R.id.nav_home_address:
+                //Update home address function
+                showHomeAddressDialog();
+                break;
+            case R.id.nav_fav:
+                startActivity(new Intent(HomeActivity.this, ListFavoriteFoodActivity.class));
+                break;
+            case R.id.nav_cart:
+                startActivity(new Intent(HomeActivity.this, CartActivity.class));
+                break;
+            case R.id.nav_orders:
+                startActivity(new Intent(HomeActivity.this, OrderStatusActivity.class));
+                break;
+            case R.id.nav_change_pass:
+                //Change password
+                showChangePasswordDialog();
+                break;
+            case R.id.nav_log_out:
+                //Remove remember user & password
+                Paper.book().destroy();
+                //Logout
+                Intent signInIntent = new Intent(HomeActivity.this, SignInActivity.class);
+                signInIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(signInIntent);
+                break;
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    /**
+     * Home Address Dialog
+     */
+    private void showHomeAddressDialog() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomeActivity.this);
+        alertDialog.setTitle("UPDATE ADDRESS");
+        alertDialog.setMessage("Please fill all information.");
+        alertDialog.setIcon(R.drawable.ic_home_black_24dp);
+        View dialog_home_address = getLayoutInflater().inflate(R.layout.dialog_update_address_home, null);
+        alertDialog.setView(dialog_home_address);
+        final PlaceAutocompleteFragment edAddress = (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+        //Hide search icon before fragment
+        edAddress.getView().findViewById(R.id.place_autocomplete_search_button)
+                .setVisibility(View.GONE);
+        //Set hint for autocomplete edit text
+        ((EditText) edAddress.getView().findViewById(R.id.place_autocomplete_search_input))
+                .setHint("Enter your home address");
+        ((EditText) edAddress.getView().findViewById(R.id.place_autocomplete_search_input))
+                .setTextSize(14);
+        // Get address from places autocomplete
+        edAddress.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+                homeAddress = place;
+            }
+
+            @Override
+            public void onError(Status status) {
+                Log.e(TAG, "onError: " + status.getStatusMessage());
+            }
+        });
+        alertDialog.setPositiveButton("UPDATE", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //Set new Home Address
+                Common.currentUser.setHomeAddress(homeAddress.getAddress().toString());
+                FirebaseDatabase.getInstance().getReference("User")
+                        .child(Common.currentUser.getPhone())
+                        .setValue(Common.currentUser)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                MDToast.makeText(HomeActivity.this, "Update Address successful", MDToast.LENGTH_SHORT, MDToast.TYPE_SUCCESS).show();
+                            }
+                        });
+                dialog.dismiss();
+                //Fix crash fragment
+                removeFragmentToFix();
+            }
+        });
+        alertDialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                //Fix crash fragment
+                removeFragmentToFix();
+            }
+        });
+
+        alertDialog.show();//Don't forget it :)))
+    }
+
+    /**
+     * Remove fragment after dialog dismiss
+     */
+    private void removeFragmentToFix() {
+        //Fix crash fragment
+        //Remove fragment
+        getFragmentManager().beginTransaction()
+                .remove(getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment))
+                .commit();
     }
 
     /**

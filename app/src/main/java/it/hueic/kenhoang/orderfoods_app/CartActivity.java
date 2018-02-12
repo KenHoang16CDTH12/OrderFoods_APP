@@ -69,6 +69,7 @@ import it.hueic.kenhoang.orderfoods_app.model.Request;
 import it.hueic.kenhoang.orderfoods_app.model.Sender;
 import it.hueic.kenhoang.orderfoods_app.model.Token;
 import it.hueic.kenhoang.orderfoods_app.remote.APIService;
+import it.hueic.kenhoang.orderfoods_app.remote.IGeoCoordinates;
 import it.hueic.kenhoang.orderfoods_app.remote.IGoogleService;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -108,6 +109,7 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
 
     //Declare Google Map API Retrofit
     IGoogleService mGoogleService;
+    IGeoCoordinates mGeoService;
 
     HashMap<String, String> address = new HashMap<>();
 
@@ -128,6 +130,7 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
         //InitService
         mService = Common.getFCMService();
         mGoogleService = Common.getGoogleMapService();
+        mGeoService = Common.getGeoCodeService();
         //InitFireBase
         mDataRequest = FirebaseDatabase.getInstance().getReference("Requests");
         //InitView
@@ -308,6 +311,54 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
                 }
             }
         });
+
+        radHomeAddress.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    if (TextUtils.isEmpty(Common.currentUser.getHomeAddress()) || Common.currentUser.getHomeAddress() == null) {
+                        MDToast.makeText(CartActivity.this, "Please update your home address !!!", MDToast.LENGTH_SHORT, MDToast.TYPE_INFO).show();
+                    } else {
+                        address.put("address", Common.currentUser.getHomeAddress());
+                        mGeoService.getGeoCode(address.get("address"))
+                                .enqueue(new Callback<String>() {
+                                    @Override
+                                    public void onResponse(Call<String> call, Response<String> response) {
+                                        JSONObject jsonObject = null;
+                                        try {
+                                            jsonObject = new JSONObject(response.body().toString());
+                                            String lat = ((JSONArray) jsonObject.get("results"))
+                                                    .getJSONObject(0)
+                                                    .getJSONObject("geometry")
+                                                    .getJSONObject("location")
+                                                    .get("lat").toString();
+                                            String lng = ((JSONArray) jsonObject.get("results"))
+                                                    .getJSONObject(0)
+                                                    .getJSONObject("geometry")
+                                                    .getJSONObject("location")
+                                                    .get("lng").toString();
+                                            address.put("lat", lat);
+                                            address.put("lng", lng);
+                                            //Set this address to edAddress
+                                            ((EditText) edAddress.getView().findViewById(R.id.place_autocomplete_search_input))
+                                                    .setText(address.get("address"));
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<String> call, Throwable t) {
+                                        MDToast.makeText(CartActivity.this, "Error " + t.getMessage(), MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+                                    }
+                                });
+
+                    }
+                }
+            }
+        });
+
         // Get address from places autocomplete
         edAddress.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
