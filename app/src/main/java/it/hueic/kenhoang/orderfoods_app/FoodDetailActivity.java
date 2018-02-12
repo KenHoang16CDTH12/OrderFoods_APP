@@ -146,7 +146,8 @@ public class FoodDetailActivity extends AppCompatActivity implements RatingDialo
                             currentFood.getName(),
                             numberButton.getNumber(),
                             currentFood.getPrice(),
-                            currentFood.getDiscount()
+                            currentFood.getDiscount(),
+                            currentFood.getImage()
                     ));
                 Snackbar.make(findViewById(R.id.coordinatorMain), "Added to cart ...", Toast.LENGTH_SHORT).show();
                 btnCart.setCount(new Database(FoodDetailActivity.this).getCountCart());
