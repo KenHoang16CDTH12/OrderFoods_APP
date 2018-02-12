@@ -6,6 +6,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
+
 import it.hueic.kenhoang.orderfoods_app.Interface.ItemClickListener;
 import it.hueic.kenhoang.orderfoods_app.R;
 import it.hueic.kenhoang.orderfoods_app.common.Common;
@@ -17,13 +19,13 @@ import it.hueic.kenhoang.orderfoods_app.common.Common;
 public class CartViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,
         View.OnCreateContextMenuListener{
     public TextView txt_card_name, txt_price;
-    public ImageView img_cart_count;
+    public ElegantNumberButton btnQuantity;
     public ItemClickListener itemClickListener;
     public CartViewHolder(View itemView) {
         super(itemView);
         txt_card_name = itemView.findViewById(R.id.cart_item_name);
         txt_price = itemView.findViewById(R.id.cart_item_price);
-        img_cart_count = itemView.findViewById(R.id.cart_item_count);
+        btnQuantity = itemView.findViewById(R.id.btnQuantity);
         itemView.setOnClickListener(this);
         itemView.setOnCreateContextMenuListener(this);
 
