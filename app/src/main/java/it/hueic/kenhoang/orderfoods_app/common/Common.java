@@ -24,7 +24,7 @@ public class Common {
     public static final String DELETE = "Delete";
     public static final String USER_KEY = "User";
     public static final String PWD_KEY = "Password";
-
+    public static final String REQUEST_PHONE_USER = "userPhone";
     private static final String BASE_URL = "https://fcm.googleapis.com/";
 
     public static APIService getFCMService() {
