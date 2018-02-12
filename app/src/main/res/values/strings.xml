@@ -12,4 +12,6 @@
 
     <string name="facebook_app_id">182288075712564</string>
     <string name="facebook_login_protocol_name">fb182288075712564</string>
+
+    <string name="google_places_api_key">AIzaSyC08f8VkizzZ6d89XHIUn1MM9LLCuSzCyw</string>
 </resources>
