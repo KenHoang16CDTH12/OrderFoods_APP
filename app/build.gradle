@@ -31,6 +31,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-database:11.8.0'
     implementation 'com.google.firebase:firebase-messaging:11.8.0'
     implementation 'com.firebaseui:firebase-ui-database:3.2.1'
+    //Google Play Service
+    implementation 'com.google.android.gms:play-services-places:11.8.0'
     //EditText Material
     implementation 'com.rengwuxian.materialedittext:library:2.1.4'
     //Picasso Library

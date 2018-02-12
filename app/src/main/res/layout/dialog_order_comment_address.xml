@@ -10,19 +10,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/edAddress"
-            android:hint="Address"
+        <fragment
+            android:id="@+id/place_autocomplete_fragment"
+            android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColorHint="@color/colorPrimary"
-            android:textColor="@color/colorPrimary"
-            android:textSize="20sp"
-            android:inputType="text"
-            app:met_baseColor="@color/colorPrimary"
-            app:met_floatingLabel="highlight"
-            app:met_primaryColor="@color/colorPrimary"
-            app:met_singleLineEllipsis="true"/>
+            />
 
         <com.rengwuxian.materialedittext.MaterialEditText
             android:id="@+id/edComment"
@@ -32,6 +25,7 @@
             android:textColorHint="@color/colorPrimary"
             android:textColor="@color/colorPrimary"
             android:textSize="18sp"
+            android:layout_margin="10dp"
             android:inputType="text"
             app:met_baseColor="@color/colorPrimary"
             app:met_floatingLabel="highlight"
