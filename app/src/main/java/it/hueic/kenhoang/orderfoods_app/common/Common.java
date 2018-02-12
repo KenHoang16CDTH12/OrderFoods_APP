@@ -12,7 +12,9 @@ import android.widget.Toast;
 import it.hueic.kenhoang.orderfoods_app.R;
 import it.hueic.kenhoang.orderfoods_app.model.User;
 import it.hueic.kenhoang.orderfoods_app.remote.APIService;
+import it.hueic.kenhoang.orderfoods_app.remote.IGoogleService;
 import it.hueic.kenhoang.orderfoods_app.remote.RetrofitClient;
+import it.hueic.kenhoang.orderfoods_app.remote.RetrofitGoogleClient;
 
 /**
  * Created by kenhoang on 26/01/2018.
@@ -26,9 +28,14 @@ public class Common {
     public static final String PWD_KEY = "Password";
     public static final String REQUEST_PHONE_USER = "userPhone";
     private static final String BASE_URL = "https://fcm.googleapis.com/";
+    private static final String GOOGLE_API_URL = "https://maps.googleapis.com/";
 
     public static APIService getFCMService() {
         return RetrofitClient.getClient(BASE_URL).create(APIService.class);
+    }
+
+    public static IGoogleService getGoogleMapService() {
+        return RetrofitGoogleClient.getGoogleClient(GOOGLE_API_URL).create(IGoogleService.class);
     }
 
     public static String convertCodeToStatus(String status) {
