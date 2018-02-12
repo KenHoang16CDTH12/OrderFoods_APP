@@ -1,8 +1,15 @@
 package it.hueic.kenhoang.orderfoods_app;
 
+import android.*;
+import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,12 +22,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
@@ -31,6 +44,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.rengwuxian.materialedittext.MaterialEditText;
+import com.valdesekamdem.library.mdtoast.MDToast;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -53,7 +67,9 @@ import retrofit2.Response;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class CartActivity extends AppCompatActivity {
+public class CartActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        LocationListener{
     private static final String TAG = CartActivity.class.getSimpleName();
     RecyclerView listCarts;
     RecyclerView.LayoutManager mLayoutManager;
@@ -68,8 +84,19 @@ public class CartActivity extends AppCompatActivity {
     CartAdapter adapter;
 
     APIService mService;
-
+    // Address
     Place shippingAddress;
+    private LocationRequest mLocationRequest;
+    private GoogleApiClient mGoogleApiClient;
+    private Location mLastLocation;
+
+    private static final int UPDATE_INTERVAL = 5000;
+    private static final int FASTEST_INTERVAL = 3000;
+    private static final int DISPLACEMENT = 10;
+
+    private static final int LOCATION_REQUEST_CODE = 71;
+    private static final int PLAY_SERVICE_REQUEST = 72;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,6 +109,8 @@ public class CartActivity extends AppCompatActivity {
             .setFontAttrId(R.attr.fontPath)
             .build());
         setContentView(R.layout.activity_cart);
+        //Request runtime permission
+        requestRuntimePermission();
         //InitService
         mService = Common.getFCMService();
         //InitFireBase
@@ -94,11 +123,84 @@ public class CartActivity extends AppCompatActivity {
         initEvent();
     }
 
+    /**
+     * Request permission
+     */
+    private void requestRuntimePermission() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                        PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+            }, LOCATION_REQUEST_CODE);
+        } else {
+            if (checkPlayService()) { //If have play service on device
+                buildGoogleApiClient();
+                createLocationRequest();
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case LOCATION_REQUEST_CODE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (checkPlayService()) { //If have play service on device
+                        buildGoogleApiClient();
+                        createLocationRequest();
+                    }
+                }
+                break;
+        }
+    }
+
+    private void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(UPDATE_INTERVAL);
+        mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setSmallestDisplacement(DISPLACEMENT);
+
+    }
+
+    private void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API).build();
+        mGoogleApiClient.connect();
+    }
+
+    private boolean checkPlayService() {
+        int resultCode = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (GoogleApiAvailability.getInstance().isUserResolvableError(resultCode))
+                GoogleApiAvailability.getInstance().getErrorDialog(this, resultCode, PLAY_SERVICE_REQUEST).show();
+            else {
+                MDToast.makeText(this, "This device is not supported", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+                finish();
+            }
+            return false;
+        }
+        return true ;
+    }
+
+    /**
+     * Change font
+     * @param newBase
+     */
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
+    /**
+     * Load list card from database
+     */
     private void loadListCart() {
         carts = new Database(this).getCarts();
         adapter = new CartAdapter(carts, this);
@@ -113,6 +215,9 @@ public class CartActivity extends AppCompatActivity {
         tvTotalPrice.setText(fmt.format(total));
     }
 
+    /**
+     * Inits Event
+     */
     private void initEvent() {
         btnPlace.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -202,6 +307,10 @@ public class CartActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
+    /**
+     * Send notificaction Order
+     * @param order_number
+     */
     private void sendNotificationOrder(final String order_number) {
         DatabaseReference tokenDB = FirebaseDatabase.getInstance().getReference("Tokens");
         final Query data = tokenDB.orderByChild("serverToken").equalTo(true);//Get all node with is Servertoken is true
@@ -245,6 +354,9 @@ public class CartActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Inits View
+     */
     private void initView() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         tvTitle         = findViewById(R.id.tvTitle);
@@ -259,6 +371,11 @@ public class CartActivity extends AppCompatActivity {
         btnPlace = findViewById(R.id.btnPlaceOrder);
     }
 
+    /**
+     * Context Menu Item
+     * @param item
+     * @return
+     */
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         if (item.getTitle().equals(Common.DELETE)) deleteCart(item.getOrder());
@@ -279,5 +396,52 @@ public class CartActivity extends AppCompatActivity {
         for (Order item: carts) new Database(this).addToCart(item);
         //Refresh
         loadListCart();
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        displayLocation();
+        startLocationUpdates();
+    }
+
+    private void startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                        PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+    }
+
+    private void displayLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                        PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if (mLastLocation != null) {
+            Log.d(TAG, "displayLocation: " + mLastLocation.getLatitude() + "/" + mLastLocation.getLongitude());
+        } else {
+            Log.d(TAG, "displayLocation: Could not get your location");
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        mLastLocation = location;
+        displayLocation();
     }
 }
