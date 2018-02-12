@@ -16,12 +16,15 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,8 +49,13 @@ import com.google.firebase.database.ValueEventListener;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.valdesekamdem.library.mdtoast.MDToast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -61,6 +69,7 @@ import it.hueic.kenhoang.orderfoods_app.model.Request;
 import it.hueic.kenhoang.orderfoods_app.model.Sender;
 import it.hueic.kenhoang.orderfoods_app.model.Token;
 import it.hueic.kenhoang.orderfoods_app.remote.APIService;
+import it.hueic.kenhoang.orderfoods_app.remote.IGoogleService;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -97,6 +106,11 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
     private static final int LOCATION_REQUEST_CODE = 71;
     private static final int PLAY_SERVICE_REQUEST = 72;
 
+    //Declare Google Map API Retrofit
+    IGoogleService mGoogleService;
+
+    HashMap<String, String> address = new HashMap<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,6 +127,7 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
         requestRuntimePermission();
         //InitService
         mService = Common.getFCMService();
+        mGoogleService = Common.getGoogleMapService();
         //InitFireBase
         mDataRequest = FirebaseDatabase.getInstance().getReference("Requests");
         //InitView
@@ -235,15 +250,64 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
 
         LayoutInflater inflater = this.getLayoutInflater();
         View dialog_address_comment = inflater.inflate(R.layout.dialog_order_comment_address, null);
-        PlaceAutocompleteFragment edAddress = (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+        final RadioButton radShipToAddress = dialog_address_comment.findViewById(R.id.radShipToAddress);
+        final RadioButton radHomeAddress = dialog_address_comment.findViewById(R.id.radHomeAddress);
+        final MaterialEditText edComment = dialog_address_comment.findViewById(R.id.edComment);
+        final PlaceAutocompleteFragment edAddress = (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
         //Hide search icon before fragment
-         edAddress.getView().findViewById(R.id.place_autocomplete_search_button)
+        edAddress.getView().findViewById(R.id.place_autocomplete_search_button)
                 .setVisibility(View.GONE);
-        //Set hint for autocomplete editext
+        //Set hint for autocomplete edit text
         ((EditText) edAddress.getView().findViewById(R.id.place_autocomplete_search_input))
                 .setHint("Enter your address");
         ((EditText) edAddress.getView().findViewById(R.id.place_autocomplete_search_input))
                 .setTextSize(14);
+        //Event radio button
+        radShipToAddress.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                //Ship to the address features
+                if (isChecked) { //isChecked == true
+                    mGoogleService.getAddressName(String.format("https://maps.googleapis.com/maps/api/geocode/json?latlng=%s,%s&sensor=false",
+                            String.valueOf(mLastLocation.getLatitude()),
+                            String.valueOf(mLastLocation.getLongitude())))
+                            .enqueue(new Callback<String>() {
+                                @Override
+                                public void onResponse(Call<String> call, Response<String> response) {
+                                    //If fetch API ok
+                                    try {
+                                        JSONObject jsonObject = new JSONObject(response.body().toString());
+                                        JSONArray resultsArray = jsonObject.getJSONArray("results");
+                                        JSONObject firstObject = resultsArray.getJSONObject(0);
+                                        String formatted_address = firstObject.getString("formatted_address");
+                                        String lat = firstObject
+                                                .getJSONObject("geometry")
+                                                .getJSONObject("location")
+                                                .get("lat").toString();
+                                        String lng = firstObject
+                                                .getJSONObject("geometry")
+                                                .getJSONObject("location")
+                                                .get("lng").toString();
+                                        address.put("address", formatted_address);
+                                        address.put("lat", lat);
+                                        address.put("lng", lng);
+                                        //Set this address to edAddress
+                                        ((EditText) edAddress.getView().findViewById(R.id.place_autocomplete_search_input))
+                                                .setText(address.get("address"));
+
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<String> call, Throwable t) {
+                                    MDToast.makeText(CartActivity.this, "Error " + t.getMessage(), MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+                                }
+                            });
+                }
+            }
+        });
         // Get address from places autocomplete
         edAddress.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
@@ -256,23 +320,43 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
                 Log.e(TAG, "onError: " + status.getStatusMessage());
             }
         });
-        final MaterialEditText edComment = dialog_address_comment.findViewById(R.id.edComment);
-
-
         alertDialog.setIcon(R.drawable.ic_shopping_cart_black_24dp);
         alertDialog.setView(dialog_address_comment);
         alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+                //Add check condition here
+                //If user select address from Place fragment, just use it
+                //If user select ship to this address, get Address from location and use it
+                //If use select Home Address, get HomeAddress from Profile and use it
+                if (!radShipToAddress.isChecked() && !radHomeAddress.isChecked()) {
+                    //If both radio is not selected ->
+                    if (shippingAddress != null) {
+                        address.put("address", shippingAddress.getAddress().toString());
+                        address.put("lat", String.valueOf(shippingAddress.getLatLng().latitude));
+                        address.put("lng", String.valueOf(shippingAddress.getLatLng().longitude));
+                    } else {
+                        MDToast.makeText(CartActivity.this, "Please enter address or select option address", MDToast.LENGTH_SHORT, MDToast.TYPE_WARNING).show();
+                        //Fix crash fragment
+                        removeFragmentToFix();
+                        return;
+                    }
+                }
+                if (address.isEmpty()) {
+                    MDToast.makeText(CartActivity.this, "Please enter address or select option address", MDToast.LENGTH_SHORT, MDToast.TYPE_WARNING).show();
+                    //Fix crash fragment
+                    removeFragmentToFix();
+                    return;
+                }
                 //Create new Request
                 Request request = new Request(
                         Common.currentUser.getPhone(),
                         Common.currentUser.getName(),
-                        shippingAddress.getAddress().toString().trim(),
+                        address.get("address"),
                         tvTotalPrice.getText().toString(),
                         "0",//Status
                         edComment.getText().toString().trim(),
-                        String.format("%s,%s", shippingAddress.getLatLng().latitude, shippingAddress.getLatLng().longitude),
+                        String.format("%s,%s", address.get("lat"), address.get("lng")),
                         carts
                 );
                 //Submit to FireBase
@@ -288,23 +372,30 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
                 sendNotificationOrder(order_number);
                 dialogInterface.dismiss();
                 //Remove fragment
-                getFragmentManager().beginTransaction()
-                        .remove(getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment))
-                        .commit();
+                removeFragmentToFix();
             }
         });
         alertDialog.setNegativeButton("NO", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 dialogInterface.dismiss();
-                //Remove fragment
-                getFragmentManager().beginTransaction()
-                        .remove(getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment))
-                        .commit();
+                //Remove Fragment
+                removeFragmentToFix();
             }
         });
 
         alertDialog.show();
+    }
+
+    /**
+     * Remove fragment after dialog dismiss
+     */
+    private void removeFragmentToFix() {
+        //Fix crash fragment
+        //Remove fragment
+        getFragmentManager().beginTransaction()
+                .remove(getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment))
+                .commit();
     }
 
     /**
