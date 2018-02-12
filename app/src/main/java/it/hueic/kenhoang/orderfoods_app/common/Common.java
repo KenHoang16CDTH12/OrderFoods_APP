@@ -12,8 +12,10 @@ import android.widget.Toast;
 import it.hueic.kenhoang.orderfoods_app.R;
 import it.hueic.kenhoang.orderfoods_app.model.User;
 import it.hueic.kenhoang.orderfoods_app.remote.APIService;
+import it.hueic.kenhoang.orderfoods_app.remote.IGeoCoordinates;
 import it.hueic.kenhoang.orderfoods_app.remote.IGoogleService;
 import it.hueic.kenhoang.orderfoods_app.remote.RetrofitClient;
+import it.hueic.kenhoang.orderfoods_app.remote.RetrofitGeoClient;
 import it.hueic.kenhoang.orderfoods_app.remote.RetrofitGoogleClient;
 
 /**
@@ -36,6 +38,14 @@ public class Common {
 
     public static IGoogleService getGoogleMapService() {
         return RetrofitGoogleClient.getGoogleClient(GOOGLE_API_URL).create(IGoogleService.class);
+    }
+
+    /**
+     * Get geo service
+     * @return
+     */
+    public static IGeoCoordinates getGeoCodeService() {
+        return RetrofitGeoClient.getClient(GOOGLE_API_URL).create(IGeoCoordinates.class);
     }
 
     public static String convertCodeToStatus(String status) {
