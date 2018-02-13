@@ -135,7 +135,7 @@ public class ListFoodActivity extends AppCompatActivity {
         //InitView
         initView();
         //Get Intent here
-        if (getIntent() != null) categoryId = getIntent().getStringExtra("CategoryId");
+        if (getIntent() != null) categoryId = getIntent().getStringExtra(Common.INTENT_MENU_ID);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {

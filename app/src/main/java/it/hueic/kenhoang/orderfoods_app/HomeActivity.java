@@ -28,6 +28,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.andremion.counterfab.CounterFab;
+import com.daimajia.slider.library.Animations.DescriptionAnimation;
+import com.daimajia.slider.library.SliderLayout;
+import com.daimajia.slider.library.SliderTypes.BaseSliderView;
+import com.daimajia.slider.library.SliderTypes.TextSliderView;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.common.api.Status;
@@ -37,8 +41,11 @@ import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.squareup.picasso.Picasso;
@@ -53,6 +60,7 @@ import it.hueic.kenhoang.orderfoods_app.Interface.ItemClickListener;
 import it.hueic.kenhoang.orderfoods_app.adapter.ViewHolder.MenuViewHolder;
 import it.hueic.kenhoang.orderfoods_app.common.Common;
 import it.hueic.kenhoang.orderfoods_app.database.Database;
+import it.hueic.kenhoang.orderfoods_app.model.Banner;
 import it.hueic.kenhoang.orderfoods_app.model.Category;
 import it.hueic.kenhoang.orderfoods_app.model.Token;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
@@ -74,6 +82,9 @@ public class HomeActivity extends AppCompatActivity
 
     // Address
     Place homeAddress;
+    //Slider
+    HashMap<String, String> image_list;
+    SliderLayout mSlider;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -157,6 +168,65 @@ public class HomeActivity extends AppCompatActivity
         });
 
         if (Common.currentUser != null) updateToken(FirebaseInstanceId.getInstance().getToken());
+
+        //Set up Slider
+        //Need call this function after you init database firebase
+        setupSlider();
+    }
+
+    private void setupSlider() {
+        mSlider = findViewById(R.id.slider);
+        image_list = new HashMap<>();
+        final DatabaseReference mBannerDB = FirebaseDatabase.getInstance().getReference("Banner");
+        mBannerDB.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot postSnapShot: dataSnapshot.getChildren()) {
+                    Banner banner = postSnapShot.getValue(Banner.class);
+                    //We will concat string name and id like
+                    //PIZZA_01 => And we will use PIZZA for show description, 01 for food id to click
+                    image_list.put(banner.getName() + "@@@" + banner.getId(), banner.getImage());
+                }
+                for (String key: image_list.keySet()) {
+                    String[] keySplit = key.split("@@@");
+                    String nameOfFood = keySplit[0];
+                    final String idOfFood = keySplit[1];
+
+                    //Create Slider
+                    final TextSliderView textSliderView = new TextSliderView(getBaseContext());
+                    textSliderView
+                            .description(nameOfFood)
+                            .image(image_list.get(key))
+                            .setScaleType(BaseSliderView.ScaleType.Fit)
+                            .setOnSliderClickListener(new BaseSliderView.OnSliderClickListener() {
+                                @Override
+                                public void onSliderClick(BaseSliderView slider) {
+                                    //We will send menu Id to food List Activity
+                                    Intent foodIntent = new Intent(HomeActivity.this, FoodDetailActivity.class);
+                                    //foodIntent.putExtra(Common.INTENT_MENU_ID, idOfFood);
+                                    foodIntent.putExtras(textSliderView.getBundle());
+                                    startActivity(foodIntent);
+                                }
+                            });
+                    //Add extra bundle
+                    textSliderView.bundle(new Bundle());
+                    textSliderView.getBundle().putString(Common.INTENT_FOOD_ID, idOfFood);
+                    mSlider.addSlider(textSliderView);
+                    //Remove event after finish
+                    mBannerDB.removeEventListener(this);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        mSlider.setPresetTransformer(SliderLayout.Transformer.Background2Foreground);
+        mSlider.setPresetIndicator(SliderLayout.PresetIndicators.Center_Bottom);
+        mSlider.setCustomAnimation(new DescriptionAnimation());
+        mSlider.setDuration(5000);
     }
 
     private void checkLoadMenuSwipe() {
@@ -202,7 +272,7 @@ public class HomeActivity extends AppCompatActivity
                         //Get CategoryId and send to new Activity
                         Intent foodListIntent = new Intent(HomeActivity.this, ListFoodActivity.class);
                         //Because CategoryId is key, so we just get key of this item
-                        foodListIntent.putExtra("CategoryId", adapter.getRef(position).getKey());
+                        foodListIntent.putExtra(Common.INTENT_MENU_ID, adapter.getRef(position).getKey());
                         startActivity(foodListIntent);
                     }
                 });
@@ -462,11 +532,13 @@ public class HomeActivity extends AppCompatActivity
         super.onResume();
         fab.setCount(new Database(this).getCountCart());
         if (adapter != null) adapter.startListening();
+        if (mSlider != null) mSlider.startAutoCycle();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         adapter.stopListening();
+        if (mSlider != null) mSlider.stopAutoCycle();
     }
 }

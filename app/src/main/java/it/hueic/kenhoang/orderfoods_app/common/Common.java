@@ -32,6 +32,7 @@ public class Common {
     public static final String PWD_KEY = "Password";
     public static final String REQUEST_PHONE_USER = "userPhone";
     public static final String INTENT_FOOD_ID = "FoodId";
+    public static final String INTENT_MENU_ID = "CategoryId";
     //Api url
     private static final String BASE_URL = "https://fcm.googleapis.com/";
     private static final String GOOGLE_API_URL = "https://maps.googleapis.com/";
