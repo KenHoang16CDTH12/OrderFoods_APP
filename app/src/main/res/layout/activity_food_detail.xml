@@ -110,7 +110,7 @@
                 app:cardUseCompatPadding="true">
                <LinearLayout
                    android:orientation="vertical"
-                   android:background="@color/colorPrimary"
+                   android:background="@color/overlayBackground"
                    android:layout_width="match_parent"
                    android:layout_height="wrap_content">
                    <RatingBar
@@ -120,7 +120,8 @@
                        android:max="5"
                        android:isIndicator="true"
                        android:layout_width="wrap_content"
-                       android:layout_height="wrap_content" />
+                       android:layout_height="wrap_content"
+                       style="?android:attr/ratingBarStyle"/>
                    <TextView
                        android:id="@+id/food_description"
                        android:layout_marginTop="12dp"
@@ -131,8 +132,19 @@
                        android:textSize="14sp"
                        android:layout_width="wrap_content"
                        android:layout_height="wrap_content" />
+
                </LinearLayout>
             </android.support.v7.widget.CardView>
+
+            <Button
+                android:id="@+id/btnShowComment"
+                android:background="@drawable/btn_signin_design"
+                android:text="Show Comment"
+                android:layout_margin="10dp"
+                android:textColor="@android:color/white"
+                android:textAllCaps="false"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
         </LinearLayout>
     </android.support.v4.widget.NestedScrollView>
     <android.support.design.widget.FloatingActionButton

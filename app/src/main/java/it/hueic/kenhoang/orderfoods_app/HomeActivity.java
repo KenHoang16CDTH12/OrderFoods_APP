@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -83,7 +82,7 @@ public class HomeActivity extends AppCompatActivity
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         //Notes : add this code before setContentView
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/restaurant_font.otf")
+                .setDefaultFontPath("fonts/food_font.ttf")
                 .setFontAttrId(R.attr.fontPath)
                 .build());
         setContentView(R.layout.activity_home);

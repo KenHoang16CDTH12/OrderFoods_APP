@@ -15,7 +15,6 @@ import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
-import com.google.firebase.FirebaseOptions;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -40,7 +39,7 @@ public class OrderStatusActivity extends AppCompatActivity {
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         //Notes : add this code before setContentView
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/restaurant_font.otf")
+                .setDefaultFontPath("fonts/food_font.ttf")
                 .setFontAttrId(R.attr.fontPath)
                 .build());
         setContentView(R.layout.activity_order_status);
