@@ -29,7 +29,6 @@ import com.facebook.share.model.SharePhotoContent;
 import com.facebook.share.widget.ShareDialog;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -47,7 +46,6 @@ import it.hueic.kenhoang.orderfoods_app.Interface.ItemClickListener;
 import it.hueic.kenhoang.orderfoods_app.adapter.ViewHolder.FoodVIewHolder;
 import it.hueic.kenhoang.orderfoods_app.common.Common;
 import it.hueic.kenhoang.orderfoods_app.database.Database;
-import it.hueic.kenhoang.orderfoods_app.model.Favorite;
 import it.hueic.kenhoang.orderfoods_app.model.Food;
 import it.hueic.kenhoang.orderfoods_app.model.Order;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
@@ -123,7 +121,7 @@ public class ListFoodActivity extends AppCompatActivity {
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         //Notes : add this code before setContentView
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/restaurant_font.otf")
+                .setDefaultFontPath("fonts/food_font.ttf")
                 .setFontAttrId(R.attr.fontPath)
                 .build());
         setContentView(R.layout.activity_list_food);

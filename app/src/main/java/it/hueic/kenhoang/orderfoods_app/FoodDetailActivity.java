@@ -1,13 +1,14 @@
 package it.hueic.kenhoang.orderfoods_app;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +28,7 @@ import com.stepstone.apprating.listener.RatingDialogListener;
 import com.valdesekamdem.library.mdtoast.MDToast;
 
 import java.util.Arrays;
+import java.util.Calendar;
 
 import it.hueic.kenhoang.orderfoods_app.common.Common;
 import it.hueic.kenhoang.orderfoods_app.database.Database;
@@ -50,6 +52,8 @@ public class FoodDetailActivity extends AppCompatActivity implements RatingDialo
     DatabaseReference mDataRating;
 
     Food currentFood;
+    //Show comment
+    Button btnShowComment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,7 +62,7 @@ public class FoodDetailActivity extends AppCompatActivity implements RatingDialo
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         //Notes : add this code before setContentView
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/restaurant_font.otf")
+                .setDefaultFontPath("fonts/food_font.ttf")
                 .setFontAttrId(R.attr.fontPath)
                 .build());
         setContentView(R.layout.activity_food_detail);
@@ -102,7 +106,7 @@ public class FoodDetailActivity extends AppCompatActivity implements RatingDialo
                 }
                 if (count != 0) {
                     float average = sum / count;
-                    ratingBar.setRating(average);
+                    ratingBar.setRating(Math.round(average));
                 }
 
             }
@@ -153,10 +157,20 @@ public class FoodDetailActivity extends AppCompatActivity implements RatingDialo
                 btnCart.setCount(new Database(FoodDetailActivity.this).getCountCart());
             }
         });
+
         btnRating.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showRatingDialog();
+            }
+        });
+
+        btnShowComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent commentIntent = new Intent(FoodDetailActivity.this, CommentActivity.class);
+                commentIntent.putExtra(Common.INTENT_FOOD_ID, foodId);
+                startActivity(commentIntent);
             }
         });
     }
@@ -185,6 +199,7 @@ public class FoodDetailActivity extends AppCompatActivity implements RatingDialo
         btnCart             = findViewById(R.id.btnCart);
         btnRating           = findViewById(R.id.btnRating);
         ratingBar           = findViewById(R.id.ratingBar);
+        btnShowComment      = findViewById(R.id.btnShowComment);
 
         food_description    = findViewById(R.id.food_description);
         food_name           = findViewById(R.id.food_name);
@@ -203,7 +218,8 @@ public class FoodDetailActivity extends AppCompatActivity implements RatingDialo
         final Rating rating = new Rating(Common.currentUser.getPhone(),
                 foodId,
                 String.valueOf(value),
-                comments);
+                comments,
+                String.valueOf(Calendar.getInstance().getTimeInMillis()));
         final String key = Common.currentUser.getPhone() + "food" + foodId;
         /*mDataRating.child(Common.currentUser.getPhone()).child(key)
                 .addValueEventListener(new ValueEventListener() {

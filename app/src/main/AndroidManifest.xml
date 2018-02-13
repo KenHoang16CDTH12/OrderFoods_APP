@@ -15,10 +15,13 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.ActionBar.Transparent"
         tools:replace="android:theme">
-        <meta-data android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_app_id"/>
-        <meta-data android:name="com.google.android.geo.API_KEY"
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_places_api_key" />
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -35,23 +38,25 @@
         <activity android:name=".FoodDetailActivity" />
         <activity android:name=".CartActivity" />
         <activity android:name=".OrderStatusActivity" />
-        <activity android:name=".ListFavoriteFoodActivity"/>
+        <activity android:name=".ListFavoriteFoodActivity" />
 
         <service android:name=".service.MyFirebaseIdService">
             <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
-
         <service android:name=".service.MyFirebaseMessaging">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
 
-        <provider android:authorities="com.facebook.app.FacebookContentProvider182288075712564"
+        <provider
             android:name="com.facebook.FacebookContentProvider"
-            android:exported="true"/>
+            android:authorities="com.facebook.app.FacebookContentProvider182288075712564"
+            android:exported="true" />
+
+        <activity android:name=".CommentActivity"></activity>
     </application>
 
 </manifest>

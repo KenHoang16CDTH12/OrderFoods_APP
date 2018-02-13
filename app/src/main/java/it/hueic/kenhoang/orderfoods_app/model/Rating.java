@@ -9,15 +9,24 @@ public class Rating {
     private String foodId;
     private String rateValue;
     private String comment;
-
+    private String timestamp;
     public Rating() {
     }
 
-    public Rating(String userPhone, String foodId, String rateValue, String comment) {
+    public Rating(String userPhone, String foodId, String rateValue, String comment, String timestamp) {
         this.userPhone = userPhone;
         this.foodId = foodId;
         this.rateValue = rateValue;
         this.comment = comment;
+        this.timestamp = timestamp;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
     }
 
     public String getUserPhone() {
