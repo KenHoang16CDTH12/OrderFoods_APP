@@ -40,6 +40,8 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -54,10 +56,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import it.hueic.kenhoang.orderfoods_app.adapter.CartAdapter;
 import it.hueic.kenhoang.orderfoods_app.common.Common;
@@ -68,6 +72,7 @@ import it.hueic.kenhoang.orderfoods_app.model.Order;
 import it.hueic.kenhoang.orderfoods_app.model.Request;
 import it.hueic.kenhoang.orderfoods_app.model.Sender;
 import it.hueic.kenhoang.orderfoods_app.model.Token;
+import it.hueic.kenhoang.orderfoods_app.model.User;
 import it.hueic.kenhoang.orderfoods_app.remote.APIService;
 import it.hueic.kenhoang.orderfoods_app.remote.IGeoCoordinates;
 import it.hueic.kenhoang.orderfoods_app.remote.IGoogleService;
@@ -256,6 +261,7 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
         final RadioButton radShipToAddress = dialog_address_comment.findViewById(R.id.radShipToAddress);
         final RadioButton radHomeAddress = dialog_address_comment.findViewById(R.id.radHomeAddress);
         final RadioButton radCOD = dialog_address_comment.findViewById(R.id.radCOD);
+        final RadioButton radYourWallet = dialog_address_comment.findViewById(R.id.radYourWallet);
         final RadioButton radPaypal = dialog_address_comment.findViewById(R.id.radPaypal);
         final MaterialEditText edComment = dialog_address_comment.findViewById(R.id.edComment);
         final PlaceAutocompleteFragment edAddress = (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
@@ -404,7 +410,7 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
                 String paymentMethod = "";
                 String paymentState = "Unpaid";
                 //Check payment
-                if (!radCOD.isChecked() && !radPaypal.isChecked()) //If both cod and paypla is not checked
+                if (!radCOD.isChecked() && !radPaypal.isChecked() && !radYourWallet.isChecked()) //If both cod and paypla is not checked
                 {
                     MDToast.makeText(CartActivity.this, "Please selected payment option", MDToast.LENGTH_SHORT, MDToast.TYPE_WARNING).show();
                     //Fix crash fragment
@@ -417,6 +423,49 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
                 } else if (radCOD.isChecked()) {
                     paymentMethod = "COD";
                     paymentState = "Unpaid";
+                } else if (radYourWallet.isChecked()) {
+                    double amount = 0;
+                    //First, we will get total prie from txtTotalPrice
+                    try {
+                        amount = Common.formatCurrency(tvTotalPrice.getText().toString(), Locale.US).doubleValue();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    //After receive total price of this order, just compare with user balance
+                    if (Double.valueOf(Common.currentUser.getBalance()) >= amount) {
+                        //Update balance
+                        double balance = Double.valueOf(Common.currentUser.getBalance()) - amount;
+                        Map<String, Object> update_balance = new HashMap<>();
+                        update_balance.put("balance", String.valueOf(balance));
+                        final DatabaseReference mDataUser = FirebaseDatabase.getInstance().getReference("User");
+                                mDataUser.child(Common.currentUser.getPhone())
+                                .updateChildren(update_balance)
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            //Refresh User
+                                            mDataUser.child(Common.currentUser.getPhone())
+                                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                                        @Override
+                                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                                            Common.currentUser = dataSnapshot.getValue(User.class);
+
+                                                        }
+
+                                                        @Override
+                                                        public void onCancelled(DatabaseError databaseError) {
+
+                                                        }
+                                                    });
+                                        }
+                                    }
+                                });
+                        paymentMethod = "Food fast wallet";
+                        paymentState = "Paid";
+                    } else {
+                        MDToast.makeText(CartActivity.this, "Your wallet not enough, please choose other payment", MDToast.LENGTH_SHORT, MDToast.TYPE_INFO).show();
+                    }
                 }
                 //Create new Request
                 Request request = new Request(

@@ -75,6 +75,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <RadioButton
+                android:id="@+id/radYourWallet"
+                android:text="Your wallet"
+                android:buttonTint="@color/colorPrimary"
+                android:textColor="@color/colorPrimaryDark"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <RadioButton
                 android:id="@+id/radPaypal"
                 android:text="Paypal"
                 android:buttonTint="@color/colorPrimary"

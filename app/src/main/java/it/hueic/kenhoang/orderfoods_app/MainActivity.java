@@ -186,6 +186,7 @@ public class MainActivity extends AppCompatActivity {
                                                 User newUser = new User();
                                                 newUser.setPhone(userPhone);
                                                 newUser.setName("Anonymous " + userPhone);
+                                                newUser.setBalance("0.0");
                                                 //Add to FireBase
                                                 mDataUser.child(userPhone)
                                                         .setValue(newUser)
