@@ -31,6 +31,8 @@ import it.hueic.kenhoang.orderfoods_app.remote.RetrofitGoogleClient;
 public class Common {
     public static User currentUser;
 
+    public static String topicName = "News";
+
     public static String nameProduct = "";
     //Default String
     public static final String DELETE = "Delete";
