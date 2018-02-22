@@ -115,18 +115,23 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FoodVIewHolder> {
     private void quickCart(final String key, FoodVIewHolder viewHolder, final Food model) {
         viewHolder.btnQuickCart.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                new Database(context).addToCart(new Order(
-                        key,
-                        model.getName(),
-                        "1",
-                        model.getPrice(),
-                        model.getDiscount(),
-                        model.getImage()
-                ));
+            public void onClick(View v) {
+                boolean isExists = new Database(context).checkFoodExists(key, Common.currentUser.getPhone());
+                if (!isExists) {
+                    new Database(context).addToCart(new Order(
+                            Common.currentUser.getPhone(),
+                            key,
+                            model.getName(),
+                            "1",
+                            model.getPrice(),
+                            model.getDiscount(),
+                            model.getImage()
+                    ));
+                } else {
+                    new Database(context).inCreaseCart(key, Common.currentUser.getPhone());
+                }
                 Snackbar.make(context.findViewById(R.id.listFavoritefoodMain), "Added to cart ...", Toast.LENGTH_SHORT).show();
             }
         });
-
     }
 }

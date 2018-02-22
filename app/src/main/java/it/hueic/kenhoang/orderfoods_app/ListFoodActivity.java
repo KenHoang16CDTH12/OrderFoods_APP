@@ -318,20 +318,26 @@ public class ListFoodActivity extends AppCompatActivity {
     }
 
     private void quickCart(final FirebaseRecyclerAdapter<Food, FoodVIewHolder> adapter, final int position, FoodVIewHolder viewHolder, final Food model) {
-        viewHolder.btnQuickCart.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new Database(getBaseContext()).addToCart(new Order(
-                        adapter.getRef(position).getKey(),
-                        model.getName(),
-                        "1",
-                        model.getPrice(),
-                        model.getDiscount(),
-                        model.getImage()
-                ));
-                Snackbar.make(findViewById(R.id.listfoodMain), "Added to cart ...", Toast.LENGTH_SHORT).show();
-            }
-        });
+            viewHolder.btnQuickCart.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    boolean isExists = new Database(getBaseContext()).checkFoodExists(adapter.getRef(position).getKey(), Common.currentUser.getPhone());
+                    if (!isExists) {
+                        new Database(getBaseContext()).addToCart(new Order(
+                                Common.currentUser.getPhone(),
+                                adapter.getRef(position).getKey(),
+                                model.getName(),
+                                "1",
+                                model.getPrice(),
+                                model.getDiscount(),
+                                model.getImage()
+                        ));
+                    } else {
+                        new Database(getBaseContext()).inCreaseCart(adapter.getRef(position).getKey(), Common.currentUser.getPhone());
+                    }
+                    Snackbar.make(findViewById(R.id.listfoodMain), "Added to cart ...", Toast.LENGTH_SHORT).show();
+                }
+            });
 
     }
 

@@ -225,7 +225,7 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
      * Load list card from database
      */
     private void loadListCart() {
-        carts = new Database(this).getCarts();
+        carts = new Database(this).getCarts(Common.currentUser.getPhone());
         adapter = new CartAdapter(carts, this);
         adapter.notifyDataSetChanged();
         listCarts.setAdapter(adapter);
@@ -486,7 +486,7 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
                 String order_number = String.valueOf(System.currentTimeMillis());
                 mDataRequest.child(String.valueOf(System.currentTimeMillis()))
                             .setValue(request);
-                new Database(getBaseContext()).cleanCart();
+                new Database(getBaseContext()).cleanCart(Common.currentUser.getPhone());
                 loadListCart();
                 adapter.notifyDataSetChanged();
                 listCarts.setAdapter(adapter);
@@ -603,7 +603,7 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
         //We will remove item at List<Order> by position
         carts.remove(position);
         //After that, we will delete all old data from SQLite
-        new Database(this).cleanCart();
+        new Database(this).cleanCart(Common.currentUser.getPhone());
         //And final, we will update new data from List<Order> to SQLite
         for (Order item: carts) new Database(this).addToCart(item);
         //Refresh

@@ -24,21 +24,32 @@ public class Database extends SQLiteAssetHelper {
         super(context, DB_NAME, null, DB_VER);
     }
 
-    public List<Order> getCarts() {
+    public boolean checkFoodExists(String foodId, String userPhone) {
+        boolean flag = false;
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = null;
+        String sqlQuery = String.format("SELECT * FROM OrderDetail WHERE UserPhone='%s' AND ProductId='%s'", userPhone, foodId);
+        cursor = db.rawQuery(sqlQuery, null);
+        if (cursor.getCount() > 0) flag = true;
+        else flag = false;
+        cursor.close();
+        return flag;
+    }
+    public List<Order> getCarts(String userPhone) {
         SQLiteDatabase db = getReadableDatabase();
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 
-        String[] sqlSelect = {"ID", "ProductId", "ProductName", "Quantity", "Price", "Discount", "Image"};
+        String[] sqlSelect = {"UserPhone", "ProductId", "ProductName", "Quantity", "Price", "Discount", "Image"};
         String sqlTable    = "OrderDetail";
 
         qb.setTables(sqlTable);
 
-        Cursor cursor = qb.query(db, sqlSelect, null, null, null, null, null);
+        Cursor cursor = qb.query(db, sqlSelect, "UserPhone=?", new String[] {userPhone}, null, null, null);
         final List<Order> result = new ArrayList<>();
         if (cursor.moveToFirst()) {
             do {
                 result.add(new Order(
-                        cursor.getInt(cursor.getColumnIndex(sqlSelect[0])),
+                        cursor.getString(cursor.getColumnIndex(sqlSelect[0])),
                         cursor.getString(cursor.getColumnIndex(sqlSelect[1])),
                         cursor.getString(cursor.getColumnIndex(sqlSelect[2])),
                         cursor.getString(cursor.getColumnIndex(sqlSelect[3])),
@@ -55,7 +66,8 @@ public class Database extends SQLiteAssetHelper {
         // INSERT INTO OrderDetail (ProductId, ProductName, Quantity, Price, Discount)
         // VALUES ('%s', '%s', '%s', '%s', '%s');
         SQLiteDatabase db = getReadableDatabase();
-        String query = String.format("INSERT INTO OrderDetail (ProductId, ProductName, Quantity, Price, Discount, Image) VALUES ('%s', '%s', '%s', '%s', '%s', '%s');",
+        String query = String.format("INSERT OR REPLACE INTO OrderDetail (UserPhone, ProductId, ProductName, Quantity, Price, Discount, Image) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s');",
+                order.getUserPhone(),
                 order.getProductId(),
                 order.getProductName(),
                 order.getQuantity(),
@@ -70,9 +82,34 @@ public class Database extends SQLiteAssetHelper {
 
     }
 
-    public void cleanCart() {
+    public void cleanCart(String userPhone) {
         SQLiteDatabase db = getReadableDatabase();
-        String query = "DELETE FROM OrderDetail";
+        String query = String.format("DELETE FROM OrderDetail WHERE UserPhone='%s'", userPhone);
+        db.execSQL(query);
+    }
+
+    public int getCountCart(String userPhone) {
+        int count = 0;
+        SQLiteDatabase db = getReadableDatabase();
+        String query = String.format("SELECT COUNT(*) FROM OrderDetail WHERE UserPhone='%s'", userPhone);
+        Cursor cursor = db.rawQuery(query, null);
+        if (cursor.moveToFirst()) {
+            do {
+                count = cursor.getInt(0);
+            } while (cursor.moveToNext());
+        }
+        return count;
+    }
+
+    public void updateCart(Order order) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = String.format("UPDATE OrderDetail SET Quantity= '%s' WHERE UserPhone = '%s' AND  ProductId='%s'", order.getQuantity(), order.getUserPhone(), order.getProductId());
+        db.execSQL(query);
+    }
+
+    public void inCreaseCart(String foodId, String userPhone) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = String.format("UPDATE OrderDetail SET Quantity=Quantity+1 WHERE UserPhone = '%s' AND  ProductId='%s'", userPhone, foodId);
         db.execSQL(query);
     }
 
@@ -121,22 +158,4 @@ public class Database extends SQLiteAssetHelper {
         return result;
     }
 
-    public int getCountCart() {
-        int count = 0;
-        SQLiteDatabase db = getReadableDatabase();
-        String query = String.format("SELECT COUNT(*) FROM OrderDetail");
-        Cursor cursor = db.rawQuery(query, null);
-        if (cursor.moveToFirst()) {
-            do {
-                count = cursor.getInt(0);
-            } while (cursor.moveToNext());
-        }
-        return count;
-    }
-
-    public void updateCart(Order order) {
-        SQLiteDatabase db = getReadableDatabase();
-        String query = String.format("UPDATE OrderDetail SET Quantity= %s WHERE ID = %d", order.getQuantity(), order.getID());
-        db.execSQL(query);
-    }
 }
