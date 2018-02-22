@@ -9,6 +9,12 @@ import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.Toast;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.Locale;
+
 import it.hueic.kenhoang.orderfoods_app.R;
 import it.hueic.kenhoang.orderfoods_app.model.User;
 import it.hueic.kenhoang.orderfoods_app.remote.APIService;
@@ -70,6 +76,14 @@ public class Common {
                 break;
         }
         return result;
+    }
+
+    //This function will convert currency to number base on locale
+    public static BigDecimal formatCurrency(String amount, Locale locale) throws ParseException {
+        NumberFormat format = NumberFormat.getCurrencyInstance(locale);
+        if (format instanceof DecimalFormat)
+            ((DecimalFormat)format).setParseBigDecimal(true);
+        return (BigDecimal) format.parse(amount.replace("[^\\d.,]", ""));
     }
 
     /**

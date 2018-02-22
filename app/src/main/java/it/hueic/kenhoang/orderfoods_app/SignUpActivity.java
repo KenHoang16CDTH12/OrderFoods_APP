@@ -68,6 +68,7 @@ public class SignUpActivity extends AppCompatActivity {
                             } else {
                                 mProgressbar.dismiss();
                                 User user = new User(edName.getText().toString(), edPass.getText().toString(), edSecureCode.getText().toString());
+                                user.setBalance("0.0");
                                 mDataUser.child(edPhone.getText().toString()).setValue(user);
                                 Toast.makeText(getBaseContext(), "Sign up successfully ...", Toast.LENGTH_SHORT).show();
                                 finish();
