@@ -19,6 +19,7 @@ import java.util.Locale;
 import it.hueic.kenhoang.orderfoods_app.CartActivity;
 import it.hueic.kenhoang.orderfoods_app.R;
 import it.hueic.kenhoang.orderfoods_app.adapter.ViewHolder.CartViewHolder;
+import it.hueic.kenhoang.orderfoods_app.common.Common;
 import it.hueic.kenhoang.orderfoods_app.database.Database;
 import it.hueic.kenhoang.orderfoods_app.model.Order;
 
@@ -55,7 +56,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartViewHolder> {
                 new Database(activity).updateCart(order);
 
                 //Calculate total price
-                List<Order> carts = new Database(activity).getCarts();
+                List<Order> carts = new Database(activity).getCarts(Common.currentUser.getPhone());
                 int total = 0;
                 for (Order orderElement: carts)
                     total += (Integer.parseInt(orderElement.getPrice())) * (Integer.parseInt(orderElement.getQuantity()));

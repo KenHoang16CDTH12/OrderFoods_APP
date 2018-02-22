@@ -146,6 +146,7 @@ public class FoodDetailActivity extends AppCompatActivity implements RatingDialo
             @Override
             public void onClick(View view) {
                     new Database(getBaseContext()).addToCart(new Order(
+                            Common.currentUser.getPhone(),
                             foodId,
                             currentFood.getName(),
                             numberButton.getNumber(),
@@ -154,7 +155,7 @@ public class FoodDetailActivity extends AppCompatActivity implements RatingDialo
                             currentFood.getImage()
                     ));
                 Snackbar.make(findViewById(R.id.coordinatorMain), "Added to cart ...", Toast.LENGTH_SHORT).show();
-                btnCart.setCount(new Database(FoodDetailActivity.this).getCountCart());
+                btnCart.setCount(new Database(FoodDetailActivity.this).getCountCart(Common.currentUser.getPhone()));
             }
         });
 
@@ -259,6 +260,6 @@ public class FoodDetailActivity extends AppCompatActivity implements RatingDialo
     @Override
     protected void onResume() {
         super.onResume();
-        btnCart.setCount(new Database(FoodDetailActivity.this).getCountCart());
+        btnCart.setCount(new Database(FoodDetailActivity.this).getCountCart(Common.currentUser.getPhone()));
     }
 }
