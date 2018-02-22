@@ -5,6 +5,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,6 +17,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -63,9 +65,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import it.hueic.kenhoang.orderfoods_app.Interface.RecyclerItemTouchHelperListtener;
 import it.hueic.kenhoang.orderfoods_app.adapter.CartAdapter;
+import it.hueic.kenhoang.orderfoods_app.adapter.ViewHolder.CartViewHolder;
 import it.hueic.kenhoang.orderfoods_app.common.Common;
 import it.hueic.kenhoang.orderfoods_app.database.Database;
+import it.hueic.kenhoang.orderfoods_app.helper.RecyclerItemTouchHelper;
 import it.hueic.kenhoang.orderfoods_app.model.MyReponse;
 import it.hueic.kenhoang.orderfoods_app.model.NotificationModel;
 import it.hueic.kenhoang.orderfoods_app.model.Order;
@@ -84,7 +89,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class CartActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener{
+        LocationListener, RecyclerItemTouchHelperListtener {
     private static final String TAG = CartActivity.class.getSimpleName();
     RecyclerView listCarts;
     RecyclerView.LayoutManager mLayoutManager;
@@ -140,6 +145,9 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
         mDataRequest = FirebaseDatabase.getInstance().getReference("Requests");
         //InitView
         initView();
+        //Swipe to remove
+        ItemTouchHelper.SimpleCallback itemSimpleCallback = new RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
+        new ItemTouchHelper(itemSimpleCallback).attachToRecyclerView(listCarts);
         //Load Data List
         loadListCart();
         //InitEvent
@@ -655,5 +663,42 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
     public void onLocationChanged(Location location) {
         mLastLocation = location;
         displayLocation();
+    }
+
+    @Override
+    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
+        if (viewHolder instanceof CartViewHolder) {
+            String name = ((CartAdapter)listCarts.getAdapter()).getItem(viewHolder.getAdapterPosition()).getProductName();
+            final Order deleteItem = ((CartAdapter)listCarts.getAdapter()).getItem(viewHolder.getAdapterPosition());
+            final int deleteIndex = viewHolder.getAdapterPosition();
+            adapter.removeItem(deleteIndex);
+            new Database(getBaseContext()).removeFromCart(deleteItem.getProductId(), Common.currentUser.getPhone());
+            //Refresh
+            updateViewCart();
+            //Make SnackBar
+            Snackbar snackbar = Snackbar.make(findViewById(R.id.relMainCart), name + " removed from cart!", Snackbar.LENGTH_LONG);
+            snackbar.setAction("UNDO", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    adapter.restoreItem(deleteItem, deleteIndex);
+                    new Database(getBaseContext()).addToCart(deleteItem);
+                    //Refresh
+                    updateViewCart();
+                }
+            });
+            snackbar.setActionTextColor(Color.YELLOW);
+            snackbar.show();
+        }
+    }
+
+    private void updateViewCart() {
+        //Calculate total price
+        List<Order> carts = new Database(this).getCarts(Common.currentUser.getPhone());
+        int total = 0;
+        for (Order orderElement: carts)
+            total += (Integer.parseInt(orderElement.getPrice())) * (Integer.parseInt(orderElement.getQuantity()));
+        Locale locale = new Locale("en", "US");
+        NumberFormat fmt = NumberFormat.getCurrencyInstance(locale);
+        tvTotalPrice.setText(fmt.format(total));
     }
 }

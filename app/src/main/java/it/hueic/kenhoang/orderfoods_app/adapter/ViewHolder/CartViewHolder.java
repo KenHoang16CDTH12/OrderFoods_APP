@@ -4,6 +4,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
@@ -21,6 +23,8 @@ public class CartViewHolder extends RecyclerView.ViewHolder implements View.OnCl
     public TextView txt_card_name, txt_price;
     public ImageView img_item_cart;
     public ElegantNumberButton btnQuantity;
+    public RelativeLayout view_background;
+    public LinearLayout view_foreground;
     public ItemClickListener itemClickListener;
     public CartViewHolder(View itemView) {
         super(itemView);
@@ -28,6 +32,8 @@ public class CartViewHolder extends RecyclerView.ViewHolder implements View.OnCl
         txt_price = itemView.findViewById(R.id.cart_item_price);
         img_item_cart = itemView.findViewById(R.id.cart_item_image);
         btnQuantity = itemView.findViewById(R.id.btnQuantity);
+        view_background = itemView.findViewById(R.id.view_background);
+        view_foreground = itemView.findViewById(R.id.view_foreground);
         itemView.setOnClickListener(this);
         itemView.setOnCreateContextMenuListener(this);
 
