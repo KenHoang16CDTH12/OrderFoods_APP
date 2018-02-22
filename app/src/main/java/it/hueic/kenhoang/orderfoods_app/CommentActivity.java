@@ -184,6 +184,11 @@ public class CommentActivity extends AppCompatActivity {
         recycler_comment.setHasFixedSize(true);
         recycler_comment.setLayoutManager(layoutManager);
         mSwipeRefreshLayout = findViewById(R.id.swipe_layout);
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
+                android.R.color.holo_green_dark,
+                android.R.color.holo_orange_dark,
+                android.R.color.holo_blue_dark
+        );
         ratingBar = findViewById(R.id.ratingBar);
         tvNumberRate = findViewById(R.id.numberRate);
     }

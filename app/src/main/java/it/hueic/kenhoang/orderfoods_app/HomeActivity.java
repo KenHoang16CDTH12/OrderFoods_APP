@@ -32,6 +32,7 @@ import com.daimajia.slider.library.Animations.DescriptionAnimation;
 import com.daimajia.slider.library.SliderLayout;
 import com.daimajia.slider.library.SliderTypes.BaseSliderView;
 import com.daimajia.slider.library.SliderTypes.TextSliderView;
+import com.facebook.accountkit.AccountKit;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.common.api.Status;
@@ -345,10 +346,7 @@ public class HomeActivity extends AppCompatActivity
         int id = item.getItemId();
         switch (id) {
             case R.id.nav_menu:
-                if (Common.isConnectedToInternet(this)) loadMenu();
-                else {
-                    MDToast.makeText(HomeActivity.this, "Please check your connection ...", MDToast.LENGTH_SHORT, MDToast.TYPE_WARNING).show();
-                }
+                checkLoadMenuSwipe();
                 break;
             case R.id.nav_home_address:
                 //Update home address function
@@ -363,22 +361,81 @@ public class HomeActivity extends AppCompatActivity
             case R.id.nav_orders:
                 startActivity(new Intent(HomeActivity.this, OrderStatusActivity.class));
                 break;
-            case R.id.nav_change_pass:
+            /*case R.id.nav_change_pass:
                 //Change password
                 showChangePasswordDialog();
+                break;*/
+            case R.id.nav_update_name:
+                showChangeNameDialog();
                 break;
             case R.id.nav_log_out:
                 //Remove remember user & password
-                Paper.book().destroy();
+                //Paper.book().destroy();
                 //Logout
-                Intent signInIntent = new Intent(HomeActivity.this, SignInActivity.class);
-                signInIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(signInIntent);
+                AccountKit.logOut();
+                Intent mainIntent = new Intent(HomeActivity.this, MainActivity.class);
+                mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(mainIntent);
                 break;
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    /**
+     * Change Name Dialog
+     */
+    private void showChangeNameDialog() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomeActivity.this);
+        alertDialog.setTitle("UPDATE NAME");
+        alertDialog.setMessage("Please fill all information.");
+        alertDialog.setIcon(R.drawable.ic_contacts_black_24dp);
+        View dialog_change_name = getLayoutInflater().inflate(R.layout.dialog_update_name, null);
+        alertDialog.setView(dialog_change_name);
+        final MaterialEditText edName = dialog_change_name.findViewById(R.id.edName);
+        edName.setTypeface(Common.setNabiLaFont(this));
+
+        //Button
+        alertDialog.setPositiveButton("CHANGE", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //Change name here
+
+                //For use SpotsDialog, please use AlertDialog From android.app, not from v7 like above AlertDialog
+                final AlertDialog waitingDialog = new SpotsDialog(HomeActivity.this);
+                waitingDialog.show();
+
+                //Update Name
+                final Map<String, Object> update_name = new HashMap<>();
+                update_name.put("name", edName.getText().toString());
+
+                FirebaseDatabase.getInstance().getReference("User")
+                        .child(Common.currentUser.getPhone())
+                        .updateChildren(update_name)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                //DIsmiss dialog
+                                waitingDialog.dismiss();
+                                if (task.isSuccessful()) {
+                                    MDToast.makeText(HomeActivity.this, "Name was updated!", MDToast.LENGTH_SHORT, MDToast.TYPE_SUCCESS).show();
+                                    tvFullName.setText(update_name.get("name").toString());
+                                }
+                            }
+                        });
+
+            }
+        });
+
+        alertDialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+
+        alertDialog.show();
     }
 
     /**

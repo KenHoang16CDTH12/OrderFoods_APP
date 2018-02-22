@@ -1,12 +1,12 @@
 package it.hueic.kenhoang.orderfoods_app;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
-import android.graphics.Typeface;
-import android.icu.text.TimeZoneFormat;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,6 +18,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
+import com.facebook.accountkit.Account;
+import com.facebook.accountkit.AccountKit;
+import com.facebook.accountkit.AccountKitCallback;
+import com.facebook.accountkit.AccountKitError;
+import com.facebook.accountkit.AccountKitLoginResult;
+import com.facebook.accountkit.ui.AccountKitActivity;
+import com.facebook.accountkit.ui.AccountKitConfiguration;
+import com.facebook.accountkit.ui.LoginType;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -28,12 +38,14 @@ import com.valdesekamdem.library.mdtoast.MDToast;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import dmax.dialog.SpotsDialog;
 import io.paperdb.Paper;
 import it.hueic.kenhoang.orderfoods_app.common.Common;
 import it.hueic.kenhoang.orderfoods_app.model.User;
 
 public class MainActivity extends AppCompatActivity {
-    private Button mBtnSignIn, mBtnSignUp;
+    private static final int REQUEST_CODE = 7171;
+    private Button mBtnContinue;
     private TextView tvSlogan;
     DatabaseReference mDataUser;
     @Override
@@ -42,18 +54,64 @@ public class MainActivity extends AppCompatActivity {
         getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        setContentView(R.layout.activity_main);
         //Facebook SDK
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        AccountKit.initialize(this);
+        setContentView(R.layout.activity_main);
         //printKeyHash();
+        //FireBase Init
+        mDataUser = FirebaseDatabase.getInstance().getReference("User");
         //InitViews
         initViews();
-        //Init Paper
-        Paper.init(this);
         //InitEvents
         initEvents();
+        //Check session facebook account kit
+        if (AccountKit.getCurrentAccessToken() != null) {
+            //Create dialog
+            final AlertDialog waitingDialog = new SpotsDialog(this);
+            waitingDialog.show();
+            waitingDialog.setMessage("Please wait");
+            waitingDialog.setCancelable(false);
+
+            AccountKit.getCurrentAccount(new AccountKitCallback<Account>() {
+                @Override
+                public void onSuccess(Account account) {
+                    //Copy code from exists user
+                    //We will just login
+                    //Login
+                    mDataUser.child(account.getPhoneNumber().toString())
+                            .addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    User localUser = dataSnapshot.getValue(User.class);
+                                    //Copy code from LoginActivity
+                                    Intent homeIntent = new Intent(MainActivity.this, HomeActivity.class);
+                                    Common.currentUser = localUser;
+                                    startActivity(homeIntent);
+                                    //Dismiss dialog
+                                    waitingDialog.dismiss();
+                                    finish();
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+                }
+
+                @Override
+                public void onError(AccountKitError accountKitError) {
+
+                }
+            });
+        }
+        /* Old code
+        //Init Paper
+        Paper.init(this);
         //CheckRemember
         checkRemember();
+        */
     }
 
     private void printKeyHash() {
@@ -73,21 +131,137 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initEvents() {
-        mBtnSignIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent signInIntent = new Intent(MainActivity.this, SignInActivity.class);
-                startActivity(signInIntent);
-            }
-        });
+      mBtnContinue.setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+               startLoginSystem();
+          }
+      });
+    }
 
-        mBtnSignUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent signUpIntent = new Intent(MainActivity.this, SignUpActivity.class);
-                startActivity(signUpIntent);
+    /**
+     * Account Kit facebbok login
+     */
+    private void startLoginSystem() {
+        Intent intentAccount = new Intent(MainActivity.this, AccountKitActivity.class);
+        AccountKitConfiguration.AccountKitConfigurationBuilder configurationBuilder =
+                new AccountKitConfiguration.AccountKitConfigurationBuilder(LoginType.PHONE,
+                        AccountKitActivity.ResponseType.TOKEN);
+        intentAccount.putExtra(AccountKitActivity.ACCOUNT_KIT_ACTIVITY_CONFIGURATION, configurationBuilder.build());
+        startActivityForResult(intentAccount, REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE) {
+            AccountKitLoginResult result = data.getParcelableExtra(AccountKitLoginResult.RESULT_KEY);
+            if (result.getError() != null) {
+                MDToast.makeText(this, "" + result.getError().getErrorType().getMessage(), MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+                return;
+            } else if(result.wasCancelled()) {
+                MDToast.makeText(this, "Cancel", MDToast.LENGTH_SHORT, MDToast.TYPE_WARNING).show();
+                return;
+            } else {
+                if (result.getAccessToken() != null) {
+                    //Show dialog
+                    final AlertDialog waitingDialog = new SpotsDialog(this);
+                    waitingDialog.show();
+                    waitingDialog.setMessage("Please wait");
+                    waitingDialog.setCancelable(false);
+
+                    //Get current phone
+                    AccountKit.getCurrentAccount(new AccountKitCallback<Account>() {
+                        @Override
+                        public void onSuccess(Account account) {
+                            final String userPhone = account.getPhoneNumber().toString();
+                            //Check if exists on Firebase Users
+                            mDataUser.orderByKey().equalTo(userPhone)
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            if (!dataSnapshot.child(userPhone).exists()) {
+                                                //If not exists
+                                                //We will create new user and login
+                                                User newUser = new User();
+                                                newUser.setPhone(userPhone);
+                                                newUser.setName("Anonymous " + userPhone);
+                                                //Add to FireBase
+                                                mDataUser.child(userPhone)
+                                                        .setValue(newUser)
+                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                            @Override
+                                                            public void onComplete(@NonNull Task<Void> task) {
+                                                                if (task.isSuccessful()) {
+                                                                    MDToast.makeText(MainActivity.this, "User register successful !", MDToast.LENGTH_SHORT, MDToast.TYPE_SUCCESS).show();
+
+                                                                    //Login
+                                                                    mDataUser.child(userPhone)
+                                                                            .addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                                @Override
+                                                                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                                                                    User localUser = dataSnapshot.getValue(User.class);
+                                                                                    //Copy code from LoginActivity
+                                                                                    Intent homeIntent = new Intent(MainActivity.this, HomeActivity.class);
+                                                                                    Common.currentUser = localUser;
+                                                                                    startActivity(homeIntent);
+                                                                                    //Dismiss dialog
+                                                                                    waitingDialog.dismiss();
+                                                                                    finish();
+                                                                                }
+
+                                                                                @Override
+                                                                                public void onCancelled(DatabaseError databaseError) {
+
+                                                                                }
+                                                                            });
+                                                                } else {
+                                                                    MDToast.makeText(MainActivity.this, "Register failed!", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+                                                                }
+                                                            }
+                                                        });
+
+
+                                            } else { //If exists
+                                                //We will just login
+                                                //Login
+                                                mDataUser.child(userPhone)
+                                                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                                                            @Override
+                                                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                                                User localUser = dataSnapshot.getValue(User.class);
+                                                                //Copy code from LoginActivity
+                                                                Intent homeIntent = new Intent(MainActivity.this, HomeActivity.class);
+                                                                Common.currentUser = localUser;
+                                                                startActivity(homeIntent);
+                                                                //Dismiss dialog
+                                                                waitingDialog.dismiss();
+                                                                finish();
+                                                            }
+
+                                                            @Override
+                                                            public void onCancelled(DatabaseError databaseError) {
+
+                                                            }
+                                                        });
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+
+                                        }
+                                    });
+                        }
+
+                        @Override
+                        public void onError(AccountKitError accountKitError) {
+                            MDToast.makeText(MainActivity.this, "" + accountKitError.getErrorType().getMessage(), MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
+                        }
+                    });
+                }
             }
-        });
+        }
     }
 
     private void checkRemember() {
@@ -150,8 +324,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initViews() {
         tvSlogan   = findViewById(R.id.tvSlogan);
-        mBtnSignIn = findViewById(R.id.btnSignIn);
-        mBtnSignUp = findViewById(R.id.btnSignUp);
+        mBtnContinue = findViewById(R.id.btnContinued);
         tvSlogan.setTypeface(Common.setNabiLaFont(this));
     }
 }
