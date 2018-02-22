@@ -348,6 +348,9 @@ public class HomeActivity extends AppCompatActivity
             case R.id.nav_menu:
                 checkLoadMenuSwipe();
                 break;
+            case R.id.nav_update_name:
+                showChangeNameDialog();
+                break;
             case R.id.nav_home_address:
                 //Update home address function
                 showHomeAddressDialog();
@@ -365,9 +368,6 @@ public class HomeActivity extends AppCompatActivity
                 //Change password
                 showChangePasswordDialog();
                 break;*/
-            case R.id.nav_update_name:
-                showChangeNameDialog();
-                break;
             case R.id.nav_log_out:
                 //Remove remember user & password
                 //Paper.book().destroy();

@@ -255,6 +255,8 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
         View dialog_address_comment = inflater.inflate(R.layout.dialog_order_comment_address, null);
         final RadioButton radShipToAddress = dialog_address_comment.findViewById(R.id.radShipToAddress);
         final RadioButton radHomeAddress = dialog_address_comment.findViewById(R.id.radHomeAddress);
+        final RadioButton radCOD = dialog_address_comment.findViewById(R.id.radCOD);
+        final RadioButton radPaypal = dialog_address_comment.findViewById(R.id.radPaypal);
         final MaterialEditText edComment = dialog_address_comment.findViewById(R.id.edComment);
         final PlaceAutocompleteFragment edAddress = (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
         //Hide search icon before fragment
@@ -399,6 +401,23 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
                     removeFragmentToFix();
                     return;
                 }
+                String paymentMethod = "";
+                String paymentState = "Unpaid";
+                //Check payment
+                if (!radCOD.isChecked() && !radPaypal.isChecked()) //If both cod and paypla is not checked
+                {
+                    MDToast.makeText(CartActivity.this, "Please selected payment option", MDToast.LENGTH_SHORT, MDToast.TYPE_WARNING).show();
+                    //Fix crash fragment
+                    removeFragmentToFix();
+                    return;
+                } else if (radPaypal.isChecked()) {
+                    //Handle after
+                    paymentMethod = "Paypal";
+                    paymentState = "Unpaid";
+                } else if (radCOD.isChecked()) {
+                    paymentMethod = "COD";
+                    paymentState = "Unpaid";
+                }
                 //Create new Request
                 Request request = new Request(
                         Common.currentUser.getPhone(),
@@ -407,6 +426,8 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
                         tvTotalPrice.getText().toString(),
                         "0",//Status
                         edComment.getText().toString().trim(),
+                        paymentMethod,
+                        paymentState,
                         String.format("%s,%s", address.get("lat"), address.get("lng")),
                         carts
                 );

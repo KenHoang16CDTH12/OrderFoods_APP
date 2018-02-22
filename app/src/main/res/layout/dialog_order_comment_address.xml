@@ -31,6 +31,12 @@
             app:met_floatingLabel="highlight"
             app:met_primaryColor="@color/colorPrimary"
             app:met_singleLineEllipsis="true"/>
+        <TextView
+            android:text="Delivery method: "
+            android:textSize="20sp"
+            android:textColor="@color/colorPrimaryDark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
         <RadioGroup
             android:layout_width="match_parent"
@@ -45,6 +51,32 @@
             <RadioButton
                 android:id="@+id/radHomeAddress"
                 android:text="Home address"
+                android:buttonTint="@color/colorPrimary"
+                android:textColor="@color/colorPrimaryDark"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </RadioGroup>
+
+        <TextView
+            android:text="Payment method: "
+            android:textSize="20sp"
+            android:textColor="@color/colorPrimaryDark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <RadioButton
+                android:id="@+id/radCOD"
+                android:text="Cash On Delivery"
+                android:buttonTint="@color/colorPrimary"
+                android:textColor="@color/colorPrimaryDark"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <RadioButton
+                android:id="@+id/radPaypal"
+                android:text="Paypal"
                 android:buttonTint="@color/colorPrimary"
                 android:textColor="@color/colorPrimaryDark"
                 android:layout_width="wrap_content"
