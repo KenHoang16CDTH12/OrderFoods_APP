@@ -10,6 +10,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,7 +49,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.rengwuxian.materialedittext.MaterialEditText;
+import com.rey.material.widget.CheckBox;
 import com.squareup.picasso.Picasso;
 import com.valdesekamdem.library.mdtoast.MDToast;
 
@@ -364,6 +367,9 @@ public class HomeActivity extends AppCompatActivity
             case R.id.nav_orders:
                 startActivity(new Intent(HomeActivity.this, OrderStatusActivity.class));
                 break;
+            case R.id.nav_setting:
+                showDialogSetting();
+                break;
             /*case R.id.nav_change_pass:
                 //Change password
                 showChangePasswordDialog();
@@ -381,6 +387,51 @@ public class HomeActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void showDialogSetting() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(HomeActivity.this);
+        alertDialog.setTitle("SETTINGS");
+        alertDialog.setIcon(R.drawable.ic_settings_black_24dp);
+        View dialog_setting = getLayoutInflater().inflate(R.layout.dialog_setting, null);
+        alertDialog.setView(dialog_setting);
+        final CheckBox chkSubNews = dialog_setting.findViewById(R.id.chkSubNew);
+        //Add code remember state of checkbox
+        Paper.init(this);
+        String isSubscribe = Paper.book().read("sub_new");
+        if(isSubscribe == null || TextUtils.isEmpty(isSubscribe) || isSubscribe.equals("false")) {
+            chkSubNews.setChecked(false);
+        } else {
+            chkSubNews.setChecked(true);
+        }
+        //Button
+        alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+             dialogInterface.dismiss();
+             if (chkSubNews.isChecked()) {
+                 FirebaseMessaging.getInstance().subscribeToTopic(Common.topicName);
+                 //Write value
+                 Paper.book().write("sub_new", "true");
+             } else {
+                 FirebaseMessaging.getInstance().unsubscribeFromTopic(Common.topicName);
+                 //Write value
+                 Paper.book().write("sub_new", "false");
+             }
+
+
+
+            }
+        });
+
+        alertDialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+
+        alertDialog.show();
     }
 
     /**
