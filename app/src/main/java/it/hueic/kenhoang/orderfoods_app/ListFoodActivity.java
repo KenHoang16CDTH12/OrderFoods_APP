@@ -82,22 +82,6 @@ public class ListFoodActivity extends AppCompatActivity {
                         .addPhoto(photo)
                         .build();
                 shareDialog.show(content);
-                shareDialog.registerCallback(callbackManager, new FacebookCallback<Sharer.Result>() {
-                    @Override
-                    public void onSuccess(Sharer.Result result) {
-                        Log.i(TAG, "onSuccess: " + result);
-                    }
-
-                    @Override
-                    public void onCancel() {
-
-                    }
-
-                    @Override
-                    public void onError(FacebookException error) {
-                        Log.e(TAG, "onError: " + error );
-                    }
-                });
             } else {
                 MDToast.makeText(ListFoodActivity.this, "Please install facebbok app ...", MDToast.LENGTH_SHORT, MDToast.TYPE_WARNING).show();
             }
@@ -393,18 +377,18 @@ public class ListFoodActivity extends AppCompatActivity {
      */
     private void favoriteFood(final FirebaseRecyclerAdapter<Food, FoodVIewHolder> adapter, final int position, final FoodVIewHolder viewHolder, final Food model) {
         //Add Favorites
-        if (localDB.isFavorite(this.adapter.getRef(position).getKey()))
+        if (localDB.isFavorite(this.adapter.getRef(position).getKey(), Common.currentUser.getPhone()))
             viewHolder.imgFav.setImageResource(R.drawable.ic_favorite_black_24dp);
         //Click to change state of Favorites
         viewHolder.imgFav.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!localDB.isFavorite(ListFoodActivity.this.adapter.getRef(position).getKey())) {
-                    localDB.addToFavorites(ListFoodActivity.this.adapter.getRef(position).getKey());
+                if (!localDB.isFavorite(ListFoodActivity.this.adapter.getRef(position).getKey(), Common.currentUser.getPhone())) {
+                    localDB.addToFavorites(ListFoodActivity.this.adapter.getRef(position).getKey(), Common.currentUser.getPhone());
                     viewHolder.imgFav.setImageResource(R.drawable.ic_favorite_black_24dp);
                     Common.showSnackBar("" + model.getName() + " was added to Favorites", ListFoodActivity.this, findViewById(R.id.listfoodMain));
                 } else {
-                    localDB.removeFromFavorites(ListFoodActivity.this.adapter.getRef(position).getKey());
+                    localDB.removeFromFavorites(ListFoodActivity.this.adapter.getRef(position).getKey(), Common.currentUser.getPhone());
                     viewHolder.imgFav.setImageResource(R.drawable.ic_favorite_border_black_24dp);
                     Common.showSnackBar("" + model.getName() + " was remove from to Favorites", ListFoodActivity.this, findViewById(R.id.listfoodMain));
                 }
