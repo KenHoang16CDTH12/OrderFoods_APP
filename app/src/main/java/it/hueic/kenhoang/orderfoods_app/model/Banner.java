@@ -5,15 +5,24 @@ package it.hueic.kenhoang.orderfoods_app.model;
  */
 
 public class Banner {
-    private String id, name, image;
+    private String id, name, image, menuId;
 
     public Banner() {
     }
 
-    public Banner(String id, String name, String image) {
+    public Banner(String id, String name, String image, String menuId) {
         this.id = id;
         this.name = name;
         this.image = image;
+        this.menuId = menuId;
+    }
+
+    public String getMenuId() {
+        return menuId;
+    }
+
+    public void setMenuId(String menuId) {
+        this.menuId = menuId;
     }
 
     public String getId() {

@@ -36,29 +36,19 @@
     </LinearLayout>
     <LinearLayout
         android:layout_alignParentBottom="true"
-        android:weightSum="2"
         android:layout_margin="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <Button
-            android:id="@+id/btnSignUp"
+            android:id="@+id/btnContinued"
             android:background="@drawable/btn_signup_design"
-            android:text="Sign Up"
+            android:text="Continue"
+            android:textSize="24sp"
+            android:fontFamily="cursive"
             android:layout_margin="10dp"
             android:textColor="@android:color/white"
             android:textAllCaps="false"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content" />
-        <Button
-            android:id="@+id/btnSignIn"
-            android:background="@drawable/btn_signin_design"
-            android:text="Sign In"
-            android:layout_margin="10dp"
-            android:textColor="@android:color/white"
-            android:textAllCaps="false"
-            android:layout_weight="1"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </LinearLayout>
 </RelativeLayout>
