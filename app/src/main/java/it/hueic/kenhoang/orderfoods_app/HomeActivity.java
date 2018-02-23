@@ -325,17 +325,22 @@ public class HomeActivity extends AppCompatActivity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_view) {
-            statusItemList = !statusItemList;
-            if (statusItemList) {
-                menu.getItem(0).setIcon(getResources().getDrawable(R.drawable.icon_view_list));
-                recycler_menu.setHasFixedSize(true);
-                recycler_menu.setLayoutManager(mLayoutManger);
-            } else {
-                menu.getItem(0).setIcon(getResources().getDrawable(R.drawable.icon_view_grid));
-                recycler_menu.setLayoutManager(new GridLayoutManager(this, 2));
-            }
-            checkLoadMenuSwipe();
+        switch (id) {
+            case R.id.action_view:
+                statusItemList = !statusItemList;
+                if (statusItemList) {
+                    menu.getItem(0).setIcon(getResources().getDrawable(R.drawable.icon_view_list));
+                    recycler_menu.setHasFixedSize(true);
+                    recycler_menu.setLayoutManager(mLayoutManger);
+                } else {
+                    menu.getItem(0).setIcon(getResources().getDrawable(R.drawable.icon_view_grid));
+                    recycler_menu.setLayoutManager(new GridLayoutManager(this, 2));
+                }
+                checkLoadMenuSwipe();
+                break;
+            case R.id.action_search:
+                startActivity(new Intent(HomeActivity.this, SearchFoodActivity.class));
+                break;
         }
         //noinspection SimplifiableIfStatement
 

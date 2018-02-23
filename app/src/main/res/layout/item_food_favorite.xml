@@ -3,12 +3,38 @@
     android:layout_width="match_parent"
     android:layout_height="300dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="10dp"
     app:cardElevation="10dp"
-    app:cardCornerRadius="0dp"
+    app:cardCornerRadius="8dp"
     android:layout_marginBottom="8dp">
+    <RelativeLayout
+        android:id="@+id/view_background"
+        android:layout_margin="8dp"
+        android:background="@color/bgRowBackground"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ImageView
+            android:id="@+id/delete_icon"
+            android:src="@drawable/ic_delete_sweep_black_24dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentEnd="true" />
+        <TextView
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/delete_icon"
+            android:text="Delete"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:layout_marginRight="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
     <LinearLayout
+        android:id="@+id/view_foreground"
         android:orientation="vertical"
-        android:background="@color/overlayBackground"
+        android:background="@android:color/white"
         android:weightSum="5"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -33,7 +59,7 @@
                 android:id="@+id/food_name"
                 android:text="Name of Food"
                 android:textSize="20sp"
-                android:textColor="@android:color/white"
+                android:textColor="@color/colorPrimaryDark"
                 android:layout_weight="8"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content" />
@@ -54,7 +80,7 @@
                 android:layout_margin="10dp"
                 android:text="$100"
                 android:textSize="20sp"
-                android:textColor="@android:color/white"
+                android:textColor="@color/colorPrimaryDark"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <ImageView
