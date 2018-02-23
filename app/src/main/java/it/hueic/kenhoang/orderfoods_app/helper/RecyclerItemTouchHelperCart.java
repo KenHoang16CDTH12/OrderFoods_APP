@@ -12,10 +12,10 @@ import it.hueic.kenhoang.orderfoods_app.adapter.ViewHolder.CartViewHolder;
  * Created by kenhoang on 22/02/2018.
  */
 
-public class RecyclerItemTouchHelper extends ItemTouchHelper.SimpleCallback {
+public class RecyclerItemTouchHelperCart extends ItemTouchHelper.SimpleCallback {
     private RecyclerItemTouchHelperListtener listtener;
 
-    public RecyclerItemTouchHelper(int dragDirs, int swipeDirs, RecyclerItemTouchHelperListtener listtener) {
+    public RecyclerItemTouchHelperCart(int dragDirs, int swipeDirs, RecyclerItemTouchHelperListtener listtener) {
         super(dragDirs, swipeDirs);
         this.listtener = listtener;
     }

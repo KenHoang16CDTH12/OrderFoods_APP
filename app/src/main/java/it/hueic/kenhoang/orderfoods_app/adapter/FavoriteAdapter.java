@@ -1,7 +1,6 @@
 package it.hueic.kenhoang.orderfoods_app.adapter;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
@@ -10,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -24,9 +22,11 @@ import java.util.List;
 import it.hueic.kenhoang.orderfoods_app.FoodDetailActivity;
 import it.hueic.kenhoang.orderfoods_app.Interface.ItemClickListener;
 import it.hueic.kenhoang.orderfoods_app.R;
-import it.hueic.kenhoang.orderfoods_app.adapter.ViewHolder.FoodVIewHolder;
+import it.hueic.kenhoang.orderfoods_app.adapter.ViewHolder.FavoriteViewHolder;
+import it.hueic.kenhoang.orderfoods_app.adapter.ViewHolder.FoodViewHolder;
 import it.hueic.kenhoang.orderfoods_app.common.Common;
 import it.hueic.kenhoang.orderfoods_app.database.Database;
+import it.hueic.kenhoang.orderfoods_app.model.Favorite;
 import it.hueic.kenhoang.orderfoods_app.model.Food;
 import it.hueic.kenhoang.orderfoods_app.model.Order;
 
@@ -34,7 +34,7 @@ import it.hueic.kenhoang.orderfoods_app.model.Order;
  * Created by kenhoang on 04/02/2018.
  */
 
-public class FavoriteAdapter extends RecyclerView.Adapter<FoodVIewHolder> {
+public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteViewHolder> {
     private List<String> listData = new ArrayList<>();
     private Activity context;
 
@@ -44,18 +44,18 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FoodVIewHolder> {
     }
 
     @Override
-    public FoodVIewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public FavoriteViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
         View itemView = inflater.inflate(R.layout.item_food_favorite, parent, false);
-        return new FoodVIewHolder(itemView);
+        return new FavoriteViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(final FoodVIewHolder holder, final int position) {
+    public void onBindViewHolder(final FavoriteViewHolder holder, final int position) {
         final Database localDB = new Database(context);
         DatabaseReference foodData = FirebaseDatabase.getInstance().getReference("Foods");
         foodData.orderByKey().equalTo(listData.get(position))
-                .addValueEventListener(new ValueEventListener() {
+                .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot: dataSnapshot.getChildren()) {
@@ -112,7 +112,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FoodVIewHolder> {
         return listData.size();
     }
 
-    private void quickCart(final String key, FoodVIewHolder viewHolder, final Food model) {
+    private void quickCart(final String key, FavoriteViewHolder viewHolder, final Food model) {
         viewHolder.btnQuickCart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -133,5 +133,19 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FoodVIewHolder> {
                 Snackbar.make(context.findViewById(R.id.listFavoritefoodMain), "Added to cart ...", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public String getItem(int position) {
+        return listData.get(position);
+    }
+
+    public void removeItem(int position) {
+        listData.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    public void restoreItem(String item, int position) {
+        listData.add(position, item);
+        notifyItemInserted(position);
     }
 }

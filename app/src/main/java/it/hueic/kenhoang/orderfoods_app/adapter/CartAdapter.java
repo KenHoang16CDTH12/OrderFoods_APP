@@ -83,6 +83,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartViewHolder> {
     public Order getItem(int position) {
         return listData.get(position);
     }
+
     public void removeItem(int position) {
         listData.remove(position);
         notifyItemRemoved(position);

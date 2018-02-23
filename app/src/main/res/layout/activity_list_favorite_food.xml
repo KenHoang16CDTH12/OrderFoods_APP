@@ -9,7 +9,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="it.hueic.kenhoang.orderfoods_app.ListFoodActivity">
-
+    <include layout="@layout/toolbar"/>
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_food"
         android:layout_marginTop="10dp"

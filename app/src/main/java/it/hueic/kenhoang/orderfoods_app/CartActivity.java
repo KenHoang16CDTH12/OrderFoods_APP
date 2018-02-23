@@ -1,6 +1,5 @@
 package it.hueic.kenhoang.orderfoods_app;
 
-import android.*;
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -33,7 +32,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
@@ -70,7 +68,7 @@ import it.hueic.kenhoang.orderfoods_app.adapter.CartAdapter;
 import it.hueic.kenhoang.orderfoods_app.adapter.ViewHolder.CartViewHolder;
 import it.hueic.kenhoang.orderfoods_app.common.Common;
 import it.hueic.kenhoang.orderfoods_app.database.Database;
-import it.hueic.kenhoang.orderfoods_app.helper.RecyclerItemTouchHelper;
+import it.hueic.kenhoang.orderfoods_app.helper.RecyclerItemTouchHelperCart;
 import it.hueic.kenhoang.orderfoods_app.model.MyReponse;
 import it.hueic.kenhoang.orderfoods_app.model.NotificationModel;
 import it.hueic.kenhoang.orderfoods_app.model.Order;
@@ -89,7 +87,8 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class CartActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener, RecyclerItemTouchHelperListtener {
+        LocationListener,
+        RecyclerItemTouchHelperListtener {
     private static final String TAG = CartActivity.class.getSimpleName();
     RecyclerView listCarts;
     RecyclerView.LayoutManager mLayoutManager;
@@ -146,7 +145,7 @@ public class CartActivity extends AppCompatActivity implements GoogleApiClient.C
         //InitView
         initView();
         //Swipe to remove
-        ItemTouchHelper.SimpleCallback itemSimpleCallback = new RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
+        ItemTouchHelper.SimpleCallback itemSimpleCallback = new RecyclerItemTouchHelperCart(0, ItemTouchHelper.LEFT, this);
         new ItemTouchHelper(itemSimpleCallback).attachToRecyclerView(listCarts);
         //Load Data List
         loadListCart();
